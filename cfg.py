@@ -13,9 +13,11 @@ grammars = {
 
 
 def main():
-    score = "u u u"
     key = "G#"
-    score = generate_score(score)
+    score = ""
+    while len(score.split()) < 50:
+        score = "u u u"
+        score = generate_score(score)
     score = keyify_score(score, key)
     score = generate_csound_score(score)
     print "f1  0   256 10  1 0 3   ; sine wave function table"
