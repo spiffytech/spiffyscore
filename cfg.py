@@ -7,14 +7,14 @@ import time
 random.seed(time.time())
 
 grammars = {
-    "u": ["I V I IV u", "e"],
+    "u": ["I V I IV u", "I IV", "I VII IV"  , "e"],
     "e": [""],
 }
 
 
 def main():
     score = "u u u"
-    key = "C"
+    key = "G#"
     score = generate_score(score)
     score = keyify_score(score, key)
     score = generate_csound_score(score)
@@ -74,7 +74,7 @@ def generate_csound_score(score):
         "F": "05",
         "F#": "06",
         "G": "07",
-        "F#": "08",
+        "G#": "08",
         "A": "09",
         "A#": "10",
         "B": "11",
