@@ -18,6 +18,7 @@ def main():
     score = generate_score(score)
     score = keyify_score(score, key)
     score = generate_csound_score(score)
+    print "f1  0   256 10  1 0 3   ; sine wave function table"
     for line in score:
         print line
 
