@@ -7,13 +7,13 @@ import time
 random.seed(time.time())
 
 def main():
-    key = "C"
+    key = "A"
     note_grammars = {
-        "u": ["I V I IV u", "I IV", "I VII IV"  , "e"],
+        "u": ["I V V V I I IV u u", "I IV u u", "I VII IV u u"  , "e"],
         "e": [""],
     }
     chord_grammars = {
-        "u": ["I IV V IV I", "e"],
+        "u": ["I IV V IV I u u", "I VII IV u u", "I V IV u u", "e"],
         "e": [""]
     }
     compose_piece(key, note_grammars)
@@ -21,7 +21,7 @@ def main():
 
 def compose_piece(key, grammars, chords=False):
     score = ""
-    while len(score.split()) < 15:
+    while len(score.split()) < 200:
         score = "u u u"
         score = generate_score(score, grammars)
     score = transliterate_score(score, key, chords)
