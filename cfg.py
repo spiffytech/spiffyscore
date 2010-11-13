@@ -6,19 +6,25 @@ import sys
 import time
 random.seed(time.time())
 
-grammars = {
-    "u": ["I V I IV u", "I IV", "I VII IV"  , "e"],
-    "e": [""],
-}
-
-
 def main():
-    key = "G#"
+    key = "C"
+    note_grammars = {
+        "u": ["I V I IV u", "I IV", "I VII IV"  , "e"],
+        "e": [""],
+    }
+    chord_grammars = {
+        "u": ["I IV V IV I", "e"],
+        "e": [""]
+    }
+    compose_piece(key, note_grammars)
+    compose_piece(key, chord_grammars, chords=True)
+
+def compose_piece(key, grammars, chords=False):
     score = ""
-    while len(score.split()) < 50:
+    while len(score.split()) < 15:
         score = "u u u"
-        score = generate_score(score)
-    score = keyify_score(score, key)
+        score = generate_score(score, grammars)
+    score = transliterate_score(score, key, chords)
     score = generate_csound_score(score)
     print "f1  0   256 10  1 0 3   ; sine wave function table"
     for line in score:
@@ -36,7 +42,7 @@ def make_scale(key):
     return scale
 
 
-def generate_score(score):
+def generate_score(score, grammars):
     while 1:
         found_substitution = False
         for key,value in grammars.iteritems():
@@ -48,7 +54,7 @@ def generate_score(score):
             break
     return score
 
-def keyify_score(score, key):
+def transliterate_score(score, key, chords=False):
     scale = make_scale(key)
     scale_conversion = {
         "I": 1,
@@ -61,8 +67,17 @@ def keyify_score(score, key):
         "VIII": 8,
     }
     keyed_score = []
-    for token in score.split():
-        keyed_score.append(scale[scale_conversion[token]-1])
+    if chords is False:
+        for token in score.split():
+            keyed_score.append(scale[scale_conversion[token]-1])
+    else:
+        for token in score.split():
+            chord = []
+            root_note_index = scale.index(key) + scale_conversion[token]
+            chord.append(scale[root_note_index])
+            chord.append(scale[(root_note_index+3) % 8])
+            chord.append(scale[(root_note_index+5) % 8])
+            keyed_score.append(chord)
     return keyed_score
 
 
@@ -84,9 +99,15 @@ def generate_csound_score(score):
     t = 0 
     csound_score = []
     for token in score:
-        note = csound_note_values[token]
-        csound_score.append("i2 %f 2 7000 %d.%s %d.%s 0 6" % (t, random.choice([8,9]), note, random.choice([8,9]), note))
-        t += .25
+        if isinstance(token, list):  # Chords
+            for note in token: 
+                note = csound_note_values[note]
+                csound_score.append("i2 %(time)f 1 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6" % {"time": t, "octave": random.choice([7,8]), "note": note})
+            t += 1
+        else:  # Individual notes
+            note = csound_note_values[token]
+            csound_score.append("i2 %(time)f 1 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6" % {"time": t, "octave": random.choice([8,9]), "note": note})
+            t += .25
     return csound_score
 
 
