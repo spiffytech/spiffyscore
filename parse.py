@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from ply import lex
+from ply import lex, yacc
 
 tokens = (
     "NOTE",
