@@ -35,7 +35,7 @@ lex.lex()
 
 #lex.input("GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD")
 #s = "GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD"
-s = "GF_G,"
+s = "GF_G,/2"
 lex.input(s)
 for tok in iter(lex.token, None):
     print repr(tok.type), repr(tok.value)
@@ -80,28 +80,28 @@ class Note(object):
 #def p_pitch(p):
 
 def p_pitch_list(p):
-    '''score : score pitch
+    '''score : score note
     '''
     p[0] = p[1] + [p[2]]
 
-def p_sore(p):
-    '''score : pitch
+def p_score(p):
+    '''score : note
     '''
     p[0] = [p[1]]
 
 
-def p_pitch_more(p):
-    ''' score : pitch NOTE_LENGTH
+def p_note(p):
+    '''note : pitch
     '''
-    print "stuff"
+    p[0] = p[1]
+
+
+def p_note_length(p):
+    ''' note : note NOTE_LENGTH
+    '''
     new_note = p[1]
     new_note.duration = p[2]
     p[0] = new_note
-
-def p_pitch(p):
-    '''pitch : BASENOTE
-    '''
-    p[0] = Note(p[1])
 
 def p_accidental(p):
     '''pitch : ACCIDENTAL pitch
@@ -117,6 +117,11 @@ def p_octave(p):
     octave = 8 + (count * increment_or_decrement)
     p[1].octave = octave
     p[0] = p[1]
+
+def p_pitch(p):
+    '''pitch : BASENOTE
+    '''
+    p[0] = Note(p[1])
 
 def p_error(p):
     print "Syntax error at '%s' of element type %s" % (p.value, p.type)
