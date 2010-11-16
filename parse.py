@@ -38,7 +38,7 @@ lex.lex()
 
 #lex.input("GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD")
 #s = "GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD"
-s = '''I IV V VI I "I" "ii"'''
+s = '''I IV V VI I "I" "ii"/2'''
 #s = "GF_G,/2"
 lex.input(s)
 for tok in iter(lex.token, None):
@@ -86,6 +86,13 @@ def p_note(p):
 
 def p_note_length(p):
     ''' note : note NOTE_LENGTH
+    '''
+    new_note = p[1]
+    new_note.duration = p[2]
+    p[0] = new_note
+
+def p_chord_length(p):
+    ''' chord : chord NOTE_LENGTH
     '''
     new_note = p[1]
     new_note.duration = p[2]
