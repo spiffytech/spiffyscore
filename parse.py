@@ -34,8 +34,8 @@ t_ignore = " |"
 lex.lex()
 
 #lex.input("GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD")
-#s = "GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD"
-s = "GF_G,/2"
+s = "GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD"
+#s = "GF_G,/2"
 lex.input(s)
 for tok in iter(lex.token, None):
     print repr(tok.type), repr(tok.value)
@@ -48,6 +48,7 @@ class Note(object):
         self.value = value
         self.duration = duration
         self.octave = octave
+        self.accidental = None
     def __repr__(self):
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
