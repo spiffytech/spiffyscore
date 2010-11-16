@@ -1,0 +1,7 @@
+* Features [0/5]
+- [ ] Top-down composition
+- [ ] Transition the melody between chords appropriately
+- [ ] Set maximum song length
+
+* Bugs [0/1]
+- [ ] Doesn't handle minor chords
