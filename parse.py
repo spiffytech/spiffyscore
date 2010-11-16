@@ -12,7 +12,10 @@ tokens = (
     "CHORD_TYPE",
 )
 
-t_BASENOTE = r"[A-Ga-g]"
+t_ignore = " |"
+
+#t_BASENOTE = r"[A-Ga-g]"
+t_BASENOTE = r"I?V?I*[^ ]"
 t_ACCIDENTAL = r"\^{1,2}|_{1,2}|="
 t_REST = r"z"
 t_OCTAVE = r"'+|,+"
@@ -29,12 +32,11 @@ def t_NOTE_LENGTH(t):
 def t_error(t):
     raise TypeError("Unknown text '%s'" % (t.value,))
 
-t_ignore = " |"
-
 lex.lex()
 
 #lex.input("GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD")
-s = "GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD"
+#s = "GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD"
+s = "I IV V VI I"
 #s = "GF_G,/2"
 lex.input(s)
 for tok in iter(lex.token, None):
@@ -51,34 +53,6 @@ class Note(object):
         self.accidental = None
     def __repr__(self):
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
-
-#def p_element(p):
-#    "element : note_element"
-#    p[0] = p[1]
-#
-#def p_note_element(p):
-#    '''note_element : note_element note_stem
-#                     | note_stem
-#    '''
-#    p[0] = p[1]
-#
-#def p_note_stem(p):
-#    '''note_stem : note'''
-#    p[0] = p[1]
-#
-#def p_note(p):
-#    '''note : note_or_rest
-#            | note_or_rest NOTE_LENGTH
-#    '''
-#    p[0] = p[1]
-#
-#def p_note_or_rest(p):
-#    '''note_or_rest : pitch
-#                    | REST
-#    '''
-#    p[0] = p[1]
-#
-#def p_pitch(p):
 
 def p_pitch_list(p):
     '''score : score note
