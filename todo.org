@@ -5,3 +5,4 @@
 
 * Bugs [0/1]
 - [ ] Doesn't handle minor chords
+- [ ] Duration syntax is absolute, not relative to BPM

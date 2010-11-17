@@ -9,29 +9,78 @@ import parse
 
 def main():
     key = "A"
-    note_grammars = {
-        "u": ["I V V V I I IV u u", "I IV u u", "I VII IV u u"  , "e"],
-        "e": [""],
-    }
-    chord_grammars = {
-        "u": ['"I" "IV" "V" "IV" "I" u u', '"I" "VII" "IV" u u', '"I" "V" "IV" u u', "e"],
-        "e": [""]
-    }
-    compose_piece(key, note_grammars)
-    compose_piece(key, chord_grammars, chords=True)
 
-def compose_piece(key, grammars, chords=False):
-    score = ""
-    while len(score.split()) < 10:
-        score = "u u u"
-        score = generate_score(score, grammars)
-    score = parse.parse(score)
-    score = transliterate_score(score, key, chords)
-    score = generate_csound_score(score)
-    print "f1  0   256 10  1 0 3   ; sine wave function table"
-    for line in score:
-        print line
+    composition = {
+        "a": {  # Movement block 'a' for reuse throughout the piece
+            "melody": {  # Instrument 'melody'
+                "csound_parameters": {
+                    "instrument": 1,
+                },
+                "grammars": {  # Notes for this instrument to use in this piece
+                    "u": ["I V V V I I IV u u", "I IV u u", "I VII IV u u"  , "e"],
+                    "e": [""],
+                },
+                "score": "u u u",
+            },
+            "rhythm": {
+                "csound_parameters": {
+                    "instrument": 1,
+                },
+                "grammars": {
+                    "u": ['"I" "IV"/2 "V"2 "IV" "I" u u', '"I" "VII" "IV" u u', '"I" "V" "IV" u u', "e"],
+                    "e": [""]
+                },
+                "score": "u u u",
+            },
+        },
+        "b": {
+            "melody": {  # Instrument 'melody'
+                "csound_parameters": {
+                    "instrument": 1,
+                },
+                "grammars": {  # Notes for this instrument to use in this piece
+                    "u": ["I V I I/2 IV/2 u u", "I4 IV u u", "I IV IV VI V u u"  , "e"],
+                    "e": [""],
+                },
+                "score": "u u u",
+            },
+            "rhythm": {
+                "csound_parameters": {
+                    "instrument": 1,
+                },
+                "grammars": {
+                    "u": ['"I" "IV"/2 "V"2 "IV" "I" u u', '"I" "VII" "IV" u u', '"I" "V" "IV" u u', "e"],
+                    "e": [""]
+                },
+                "score": "u u u",
+            },
+        },
+    }
 
+    for comp_name, comp in composition.iteritems():
+        for instr_name, instr in comp.iteritems():
+            generated_score = generate_score(instr["score"], instr["grammars"])  # Fill in the scores by generating them based on the grammars
+#                composition[comp_name][instr_name][grammar]["score"] = parse.parse(generate_score)  # Return Node/Chord objects
+            score = parse.parse(generated_score)  # Return Node/Chord objects
+
+            # Generate timestamps for the notes 
+            t = 0
+            for note in range(len(score)):
+                score[note].time = t
+                t += score[note].duration
+            composition[comp_name][instr_name]["score"] = score
+
+    # Must be done after all note times keyed in, else you c,an't coordinate melodies with the rhythm chords
+    for comp_name, comp in composition.iteritems():
+        for instr_name, instr in comp.iteritems():
+            composition[comp_name][instr_name]["score"] = transliterate_score(composition[comp_name][instr_name]["score"], key)
+#            print "\nMovement %s instrument %s" % (comp_name, instr_name)
+#            print composition[comp_name][instr_name]["score"] 
+            print "f1  0   256 10  1 0 3   ; sine wave function table"
+            final_score = generate_csound_score(composition[comp_name][instr_name]["score"])
+            for line in final_score:
+                print line
+            
 
 def make_scale(key):
     notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
@@ -52,7 +101,7 @@ def generate_score(score, grammars):
                 found_substitution = True
                 while score.find(key) != -1:
                     score = score.replace(key, random.choice(grammars[key]), 1)
-                    if len(score) > 200:
+                    if len(score.split()) > 200:
                         score = score.replace("u", "")
                         score = score.replace("e", "")
                         return score
@@ -60,7 +109,7 @@ def generate_score(score, grammars):
             break
     return score
 
-def transliterate_score(score, key, chords=False):
+def transliterate_score(score, key):
     scale = make_scale(key)
     scale_conversion = {
         "I": 1,
@@ -73,11 +122,10 @@ def transliterate_score(score, key, chords=False):
         "VIII": 8,
     }
     keyed_score = []
-    if chords is False:
-        for i in range(len(score)):
+    for i in range(len(score)):
+        if isinstance(score[i], parse.Note):
             score[i].value = scale[scale_conversion[score[i].value]-1]
-    else:
-        for i in range(len(score)):
+        else:
             chord = []
             root_note_index = scale.index(key) + scale_conversion[score[i].value]
             chord.append(scale[root_note_index])
