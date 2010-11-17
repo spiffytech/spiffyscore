@@ -12,49 +12,50 @@ def main():
 
     composition = {
         "a": {  # Movement block 'a' for reuse throughout the piece
-            "melody": {  # Instrument 'melody'
-                "csound_parameters": {
-                    "instrument": 1,
-                },
-                "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["I V V V I I IV u u", "I IV u u", "I VII IV u u"  , "e"],
-                    "e": [""],
-                },
-                "score": "u u u",
-            },
+#            "melody": {  # Instrument 'melody'
+#                "csound_parameters": {
+#                    "instrument": 1,
+#                },
+#                "grammars": {  # Notes for this instrument to use in this piece
+#                    "u": ["I V V V I I IV u u", "I IV u u", "I VII IV u u"  , "e"],
+#                    "e": [""],
+#                },
+#                "score": "u u u",
+#            },
             "rhythm": {
                 "csound_parameters": {
                     "instrument": 1,
                 },
                 "grammars": {
-                    "u": ['"I" "IV"/2 "V"2 "IV" "I" u u', '"I" "VII" "IV" u u', '"I" "V" "IV" u u', "e"],
+#                    "u": ['"I" "ii"/4 "ii"/4 "IV"/2 "V"2 "IV" "I" u u', '"I" "vii" "IV" u u', '"I" "v" "IV" u u', "e"],
+                    "u": ['"i" "I" "ii" "II" "v" "V" u', "e"],
                     "e": [""]
                 },
                 "score": "u u u",
             },
         },
-        "b": {
-            "melody": {  # Instrument 'melody'
-                "csound_parameters": {
-                    "instrument": 1,
-                },
-                "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["I V I I/2 IV/2 u u", "I4 IV u u", "I IV IV VI V u u"  , "e"],
-                    "e": [""],
-                },
-                "score": "u u u",
-            },
-            "rhythm": {
-                "csound_parameters": {
-                    "instrument": 1,
-                },
-                "grammars": {
-                    "u": ['"I" "IV"/2 "V"2 "IV" "I" u u', '"I" "VII" "IV" u u', '"I" "V" "IV" u u', "e"],
-                    "e": [""]
-                },
-                "score": "u u u",
-            },
-        },
+#        "b": {
+#            "melody": {  # Instrument 'melody'
+#                "csound_parameters": {
+#                    "instrument": 1,
+#                },
+#                "grammars": {  # Notes for this instrument to use in this piece
+#                    "u": ["I V I I/2 IV/2 u u", "I4 IV u u", "I IV IV VI V u u"  , "e"],
+#                    "e": [""],
+#                },
+#                "score": "u u u",
+#            },
+#            "rhythm": {
+#                "csound_parameters": {
+#                    "instrument": 1,
+#                },
+#                "grammars": {
+#                    "u": ['"I" "IV"/2 "V"2 "IV" "I" u u', '"I" "VII" "IV" u u', '"I" "V" "IV" u u', "e"],
+#                    "e": [""]
+#                },
+#                "score": "u u u",
+#            },
+#        },
     }
 
     for comp_name, comp in composition.iteritems():
@@ -129,7 +130,10 @@ def transliterate_score(score, key):
             chord = []
             root_note_index = scale.index(key) + scale_conversion[score[i].value]
             chord.append(scale[root_note_index])
-            chord.append(scale[(root_note_index+3) % 8])
+            if score[i].chord_type == "m":  # Minor chords, flat the 3rd
+                chord.append(scale[(root_note_index+2) % 8])
+            else:
+                chord.append(scale[(root_note_index+3) % 8])
             chord.append(scale[(root_note_index+5) % 8])
             score[i].chord = chord
     return score

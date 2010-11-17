@@ -104,7 +104,9 @@ def parse(score):
         '''chord : QUOTE pitch QUOTE
                 | QUOTE pitch CHORD_TYPE QUOTE
         '''
-        p[0] = Chord(value=p[2].value)
+        pitch = p[2].value
+        pitch = pitch.upper()
+        p[0] = Chord(value=pitch)
         if len(p) > 3:
             p[0].chord_type = p[3]
 

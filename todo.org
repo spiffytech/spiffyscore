@@ -1,8 +1,17 @@
-* Features [0/5]
-- [ ] Top-down composition
+* Features [1/4]
+- [X] Top-down composition
 - [ ] Transition the melody between chords appropriately
 - [ ] Set maximum song length
+- [ ] Need to support all chord types
 
-* Bugs [0/1]
-- [ ] Doesn't handle minor chords
+* Bugs [1/5]
+- [ ] TLD resets clock for each movement
+- [ ] TLD doesn't accept an ordering for the movements
+- [X] Doesn't handle minor chords
 - [ ] Duration syntax is absolute, not relative to BPM
+- [ ] Chords don't respect octaves
+
+
+* Structure [0/2]
+- [ ] Chords should be composed of Notes, not ordinary arrays
+- [ ] Generate score with proper generation tools
