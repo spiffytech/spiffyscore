@@ -73,12 +73,12 @@ def main():
             composition[comp_name][instr_name]["score"] = score
 
     # Must be done after all note times keyed in, else you can't coordinate melodies with the rhythm chords
+    print "f1  0   256 10  1 0 3   ; sine wave function table"
     for comp_name in progression.split():
         for instr_name, instr in composition[comp_name].iteritems():
             composition[comp_name][instr_name]["score"] = transliterate_score(composition[comp_name][instr_name]["score"], key)
 #            print "\nMovement %s instrument %s" % (comp_name, instr_name)
 #            print composition[comp_name][instr_name]["score"] 
-            print "f1  0   256 10  1 0 3   ; sine wave function table"
             final_score = generate_csound_score(composition[comp_name][instr_name]["score"], composition[comp_name][instr_name]["score_line"])
             for line in final_score:
                 print line
