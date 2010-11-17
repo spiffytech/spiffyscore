@@ -19,6 +19,13 @@ class Chord():
         return "Chord %s %s %s" % (self.value, self.duration, self.chord_type)
 
 
+class Rest():
+    def __init__(self, duration=.25):
+        self.duration = duration
+    def __repr__(self):
+        return "Rest node %s" % self.duration
+
+
 def parse(score):
     # Tokenize (lex)
     tokens = (
@@ -68,13 +75,15 @@ def parse(score):
 
     def p_pitch_list(p):
         '''score : score note
-            score : score chord
+            | score chord
+            | score rest
         '''
         p[0] = p[1] + [p[2]]
 
     def p_score(p):
         '''score : note
-            score : chord
+            | chord
+            | rest
         '''
         p[0] = [p[1]]
 
@@ -130,6 +139,14 @@ def parse(score):
         '''pitch : BASENOTE
         '''
         p[0] = Note(p[1])
+
+    def p_rest(p):
+        ''' rest : REST
+                | REST NOTE_LENGTH
+        '''
+        p[0] = Rest()
+        if len(p) > 2:
+            p[0].duration = p[2]
 
     def p_error(p):
         print "Syntax error at '%s' of element type %s" % (p.value, p.type)

@@ -1,9 +1,11 @@
-* Features [1/5]
+* Features [1/7]
 - [X] Top-down composition
 - [ ] Transition the melody between chords appropriately
-- [ ] Set maximum song length
+- [ ] Set maximum song length of movement
+- [ ] Set minimum song length of movement
 - [ ] Need to support all chord types
 - [ ] Doesn't handle rest notes
+- [ ] Handle full ABC BNF (yeah, right...)
 
 * Bugs [4/5]
 - [X] TLD resets clock for each movement

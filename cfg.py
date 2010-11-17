@@ -13,6 +13,7 @@ def main():
     bps = 80/60
     print bps
     tempo = 1/bps
+    max_duration = 1
 
     composition = {
         "a": {  # Movement block 'a' for reuse throughout the piece
@@ -114,7 +115,7 @@ def generate_score(score, grammars):
                 found_substitution = True
                 while score.find(key) != -1:
                     score = score.replace(key, random.choice(grammars[key]), 1)
-                    if len(score.split()) > 20:
+                    if len(score.split()) > 200:
                         score = score.replace("u", "")
                         score = score.replace("e", "")
                         return score
@@ -138,7 +139,7 @@ def transliterate_score(score, key):
     for i in range(len(score)):
         if isinstance(score[i], parse.Note):
             score[i].value = scale[scale_conversion[score[i].value]-1]
-        else:
+        elif isinstance(score[i], parse.Chord):
             chord = []
             root_note_index = scale.index(key) + scale_conversion[score[i].value]
             chord.append(scale[root_note_index])
@@ -148,6 +149,8 @@ def transliterate_score(score, key):
                 chord.append(scale[(root_note_index+3) % 8])
             chord.append(scale[(root_note_index+5) % 8])
             score[i].chord = chord
+        elif isinstance(score[i], parse.Rest):
+            pass
     return score
 
 
@@ -172,7 +175,7 @@ def generate_csound_score(score):
             for note in token.chord: 
                 note = csound_note_values[note]
                 csound_score.append("i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6" % {"time": token.time, "octave": random.choice([7,8]), "note": note, "duration": token.duration})
-        else:  # Individual notes
+        elif isinstance(token, parse.Note):  # Individual notes
             note = csound_note_values[token.value]
             csound_score.append("i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6" % {"time": token.time, "octave": random.choice([8,9]), "note": note, "duration": token.duration})
     return csound_score
