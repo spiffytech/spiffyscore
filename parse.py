@@ -11,7 +11,7 @@ class Note():
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
 class Chord():
-    def __init__(self, value, duration=.25, chord_type="major"):
+    def __init__(self, value, duration=.5, chord_type="major"):
         self.value = value
         self.duration = duration
         self.chord_type = chord_type
