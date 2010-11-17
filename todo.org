@@ -5,11 +5,11 @@
 - [ ] Need to support all chord types
 - [ ] Doesn't handle rest notes
 
-* Bugs [3/5]
+* Bugs [4/5]
 - [X] TLD resets clock for each movement
 - [X] TLD doesn't accept an ordering for the movements
 - [X] Doesn't handle minor chords    
-- [ ] Calculated duration is absolute, not relative to BPM
+- [X] Calculated duration is absolute, not relative to BPM
 - [ ] Chords don't respect octaves
 
 

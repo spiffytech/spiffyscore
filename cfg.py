@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import division
 import os
 import random
 import sys
@@ -9,6 +10,9 @@ import parse
 
 def main():
     key = "A"
+    bps = 80/60
+    print bps
+    tempo = 1/bps
 
     composition = {
         "a": {  # Movement block 'a' for reuse throughout the piece
@@ -18,7 +22,6 @@ def main():
                 },
                 "grammars": {  # Notes for this instrument to use in this piece
                     "u": ["I V V V I I IV u u", "I IV u u", "I VII IV u u"  , "e"],
-#                    "u": ["I I I I u u", "e"],
                     "e": [""],
                 },
                 "score": "u u u u u",
@@ -28,8 +31,8 @@ def main():
                     "instrument": 1,
                 },
                 "grammars": {
-#                    "u": ['"I" "ii"/4 "ii"/4 "IV"/2 "V"2 "IV" "I" u u', '"I" "vii" "IV" u u', '"I" "v" "IV" u u', "e"],
-                    "u": ['"i" "I" "ii" "II" "v" "V" u', "e"],
+                    "u": ['"I" "ii"/4 "ii"/4 "IV"/2 "V"2 "IV" "I" u u', '"I" "vii" "IV" u u', '"I" "v" "IV" u u', "e"],
+#                    "u": ['"i" "I" "ii" "II" "v" "V" u', "e"],
                     "e": [""]
                 },
                 "score": "u u u",
@@ -72,11 +75,13 @@ def main():
             t = instr_start_time
             for note in range(len(score)):
                 score[note].time = t
+#                print "Original duration:", score[note].duration
+                score[note].duration *= tempo
+#                print "New duration:", score[note].duration
                 t += score[note].duration
+#                print "t:", t
                 max_t = t if t > max_t else max_t
-#                print "end note,", max_t
             composition[comp_name][instr_name]["score"] = score
-#            print "end instr,", max_t
 
     # Must be done after all note times keyed in, else you can't coordinate melodies with the rhythm chords
     for comp_name in progression.split():
