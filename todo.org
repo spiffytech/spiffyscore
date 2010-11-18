@@ -1,4 +1,4 @@
-* Features [2/9]
+* Features [3/9]
 - [X] Top-down composition
 - [ ] Coordinate the melody and rhythm
 - [ ] Set maximum song length of movement
@@ -7,7 +7,7 @@
 - [ ] Need to support all chord types
 - [X] Doesn't handle rest notes
 - [ ] Handle full ABC BNF (yeah, right...)
-- [ ] Set instrument octave in score file
+- [X] Set instrument octave in score file
 
 * Bugs [4/5]
 - [X] TLD resets clock for each movement

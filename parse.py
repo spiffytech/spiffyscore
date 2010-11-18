@@ -131,15 +131,14 @@ def parse(score, default_octave=8):
         '''
         count = len(p[2])
         increment_or_decrement = 1 if p[2][0] == "'" else -1
-        print "octave=", default_octave
-        octave = default_octave + (count * increment_or_decrement)
+        octave = p[1].octave + (count * increment_or_decrement)
         p[1].octave = octave
         p[0] = p[1]
 
     def p_pitch(p):
         '''pitch : BASENOTE
         '''
-        p[0] = Note(p[1])
+        p[0] = Note(p[1], octave=default_octave)
 
     def p_rest(p):
         ''' rest : REST

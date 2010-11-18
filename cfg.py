@@ -18,9 +18,9 @@ def main():
         "a": {  # Movement block 'a' for reuse throughout the piece
             "bassline": {  # Instrument 'melody'
                 "score_line": "i1 %(time)f %(duration)f 10000 %(octave)d.%(note)s",
-                "octave": 6,
+                "octave": 5,
                 "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["I,/2 z/2 I,/2 z/2 I,/2 z/2 V,/2 z/2 u u", "e"],
+                    "u": ["I/2 z/2 I/2 z/2 I/2 z/2 V/2 z/2 u u", "e"],
                     "e": [""],
                 },
                 "score": "u u u u u",
