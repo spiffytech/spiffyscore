@@ -16,24 +16,72 @@ def main():
 
     composition = {
         "a": {  # Movement block 'a' for reuse throughout the piece
-            "bassline": {  # Instrument 'melody'
-                "score_line": "i1 %(time)f %(duration)f 10000 %(octave)d.%(note)s",
-                "octave": 5,
+            "melody": {  # Instrument 'melody'
+                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                "octave": 8,
                 "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["I/2 z/2 I/2 z/2 I/2 z/2 V/2 z/2 u u", "e"],
+                    "u": ["I V/2 V/2 V/2 I VII, IV' x u", "I IV w w", "I VII IV u u"  , "e"],
+                    "w": ['VII I IV V VI u', 'w w', "e"],
+                    "x": ['VI/4 III/4 II/4 I/4 w', 'x x', "e"],
                     "e": [""],
                 },
                 "score": "u u u u u",
+            },
+            "rhythm": {
+                "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                "octave": 7,
+                "grammars": {
+                    "u": ['"I" "ii"/4 "ii"/4 "IV"/2 "V"2 "IV" "ii" x u', '"I" "vii" "III" y u', '"I" "v" "IV" u u', "e"],
+                    "w": ['"i" "VII"2 "VI"/4 "V"/4 "i"/4 "VII"2 "VI" "V" w u', "e"],
+                    "x": ['"III/2" "VI"/2 "III"/2 "vii"2 "i"2 "V" u', "e"],
+                    "y": ['"I" "vi"2 "IV" "V" y y u', "e"],
+                    "e": [""]
+                },
+                "score": "u x u y x w u",
+            },
+#            "bass": {
+#                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+#                "octave": 5,
+#                "grammars": {  # Notes for this instrument to use in this piece
+#                    "u": ['"I" "V" "vi" "iii" "IV" "I" "IV" "V" u u' , "e"],
+#                    "e": [""],
+#                },
+#                "score": "u u u u u",
+#            },
+        },
+        "b": {  # Movement block 'a' for reuse throughout the piece
+            "melody": {  # Instrument 'melody'
+                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                "octave": 8,
+                "grammars": {  # Notes for this instrument to use in this piece
+                    "u": ['I VII V III u', "y", "e"],
+                    "w": ['VII I IV V VI u', 'w w', "e"],
+                    "x": ['VI/4 III/4 II/4 I/4 w', 'x x', "e"],
+                    "y": ["III/4 VI/4 II/4 V/4 VI/4 IV/4 VII2", "e"],
+                    "e": [""],
+                },
+                "score": "w w x x w",
+            },
+            "rhythm": {
+                "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                "octave": 7,
+                "grammars": {
+                    "u": ['"I" "V" "vi" "iii" "IV" "I" "IV" "V" u u', "y", "e"],
+                    "y": ['"I" "vi"2 "IV" "V" y y u', "e"],
+                    "e": [""]
+                },
+                "score": "u u y y u",
             },
         },
     }
 
     max_t = 0  # max time encountered so far. Used for movement timing
-    progression = "a"
+    progression = "a b"
     for comp_name in progression.split():
         instr_start_time = max_t
         for instr_name, instr in composition[comp_name].iteritems():
             generated_score = generate_score(instr["score"], instr["grammars"])  # Fill in the scores by generating them based on the grammars
+#            print generated_score
             score = parse.parse(generated_score, default_octave=instr["octave"])  # Return Node/Chord objects
 
             # Generate timestamps for the notes 
@@ -46,9 +94,9 @@ def main():
             composition[comp_name][instr_name]["score"] = score
 
     # Must be done after all note times keyed in, else you can't coordinate melodies with the rhythm chords
-    print "f1  0  512  10  1"
-#    print "f1  0   513 9 1 1 0 3 .33 180 5 .2 0 7 .143 180 9 .111 0"
-#    print "f2 0 8192 10 .24 .64 .88 .76 ,96 .5 .24 .08"
+    print '''f1  0  512  10  1
+            f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
+    '''
     for comp_name in progression.split():
         for instr_name, instr in composition[comp_name].iteritems():
             composition[comp_name][instr_name]["score"] = transliterate_score(composition[comp_name][instr_name]["score"], key)
@@ -79,8 +127,8 @@ def generate_score(score, grammars):
                 while score.find(key) != -1:
                     score = score.replace(key, random.choice(grammars[key]), 1)
                     if len(score.split()) > 200:
-                        score = score.replace("u", "")
-                        score = score.replace("e", "")
+                        for k in grammars.keys():
+                            score = score.replace(k, "")
                         return score
         if found_substitution is False:
             break
@@ -106,11 +154,11 @@ def transliterate_score(score, key):
             chord = []
             root_note_index = scale.index(key) + scale_conversion[score[i].value]
             chord.append(scale[root_note_index])
-            if score[i].chord_type == "m":  # Minor chords, flat the 3rd
-                chord.append(scale[(root_note_index+2) % 8])
+            chord.append(scale[(root_note_index+3) % 8])
+            if score[i].chord_type == "m":  # Minor chords, flat the 5th
+                chord.append(scale[(root_note_index+4) % 8])
             else:
-                chord.append(scale[(root_note_index+3) % 8])
-            chord.append(scale[(root_note_index+5) % 8])
+                chord.append(scale[(root_note_index+5) % 8])
             score[i].chord = chord
         elif isinstance(score[i], parse.Rest):
             pass

@@ -126,13 +126,12 @@ def parse(score, default_octave=8):
         p[2].accidental = p[1]
         p[0] = p[2]
 
-    def p_octave(p):
+    def p_pitch_octave(p):
         '''pitch : pitch OCTAVE
         '''
         count = len(p[2])
-        increment_or_decrement = 1 if p[2][0] == "'" else -1
-        octave = p[1].octave + (count * increment_or_decrement)
-        p[1].octave = octave
+        increment_or_decrement = 1 if p[2].startswith("'") else -1
+        p[1].octave += (count * increment_or_decrement)
         p[0] = p[1]
 
     def p_pitch(p):
