@@ -101,7 +101,7 @@ def main():
             "melody": {  # Instrument 'melody'
                 "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
                 "octave": 8,
-                "duration": 24,
+                "duration": 20,
                 "grammars": {  # Notes for this instrument to use in this piece
                     "u": ['I VII V III u', "y"],
                     "w": ['VII I IV V VI u', 'w w'],
