@@ -26,7 +26,7 @@ class Rest():
         return "Rest node %s" % self.duration
 
 
-def parse(score):
+def parse(score, default_octave=8):
     # Tokenize (lex)
     tokens = (
         "NOTE_LENGTH",
@@ -130,8 +130,9 @@ def parse(score):
         '''pitch : pitch OCTAVE
         '''
         count = len(p[2])
-        increment_or_decrement = 1 if p[2][0] == "," else -1
-        octave = 8 + (count * increment_or_decrement)
+        increment_or_decrement = 1 if p[2][0] == "'" else -1
+        print "octave=", default_octave
+        octave = default_octave + (count * increment_or_decrement)
         p[1].octave = octave
         p[0] = p[1]
 

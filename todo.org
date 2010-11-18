@@ -1,11 +1,13 @@
-* Features [1/7]
+* Features [2/9]
 - [X] Top-down composition
-- [ ] Transition the melody between chords appropriately
+- [ ] Coordinate the melody and rhythm
 - [ ] Set maximum song length of movement
 - [ ] Set minimum song length of movement
+- [ ] Get all tracks to end at the same time
 - [ ] Need to support all chord types
-- [ ] Doesn't handle rest notes
+- [X] Doesn't handle rest notes
 - [ ] Handle full ABC BNF (yeah, right...)
+- [ ] Set instrument octave in score file
 
 * Bugs [4/5]
 - [X] TLD resets clock for each movement
@@ -15,7 +17,7 @@
 - [ ] Chords don't respect octaves
 
 
-* Structure [0/3]    
+* Structure [1/3]    
 - [ ] Chords should be composed of Notes, not ordinary arrays
 - [ ] Generate score with proper generation tools
-- [ ] Store csound score lines with instruments
+- [X] Store csound score lines with instruments
