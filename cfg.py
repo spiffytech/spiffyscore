@@ -19,16 +19,18 @@ def main():
             "melody": {  # Instrument 'melody'
                 "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
                 "octave": 8,
+                "duration": 40,
                 "grammars": {  # Notes for this instrument to use in this piece
                     "u": ["I V/2 V/2 V/2 I VII, IV' x u", "I IV w w", "I VII IV u u"],
                     "w": ['VII I IV V VI u', 'w w'],
                     "x": ['VI/4 III/4 II/4 I/4 w', 'x x'],
                 },
-                "score": "u u u u u",
+                "score": "u",
             },
             "rhythm": {
                 "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
                 "octave": 7,
+                "duration": 50,
                 "grammars": {
                     "u": ['"I" "ii"/4 "ii"/4 "IV"/2 "V"2 "IV" "ii" x u', '"I" "vii" "III" y u', '"I" "v" "IV" u u'],
                     "w": ['"i" "VII"2 "VI"/4 "V"/4 "i"/4 "VII"2 "VI" "V" w u'],
@@ -51,6 +53,7 @@ def main():
             "melody": {  # Instrument 'melody'
                 "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
                 "octave": 8,
+                "duration": 20,
                 "grammars": {  # Notes for this instrument to use in this piece
                     "u": ['I VII V III u', "y"],
                     "w": ['VII I IV V VI u', 'w w'],
@@ -62,6 +65,55 @@ def main():
             "rhythm": {
                 "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
                 "octave": 7,
+                "duration": 24,
+                "grammars": {
+                    "u": ['"I" "V" "vi" "iii" "IV" "I" "IV" "V" u u', "y"],
+                    "y": ['"I" "vi"2 "IV" "V" y y u'],
+                },
+                "score": "u u y y u",
+            },
+        },
+        "c": {  # Movement block 'a' for reuse throughout the piece
+            "melody": {  # Instrument 'melody'
+                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                "octave": 8,
+                "duration": 20,
+                "grammars": {  # Notes for this instrument to use in this piece
+                    "u": ['I VI/2 VI/2 IV/2 u', "y"],
+                    "w": ['VII/2 I/2 II/2 V/2 u', 'w w'],
+                    "x": ['VI/4 III/4 II/4 I/4 w', 'x x'],
+                    "y": ["III/4 VI/4 II/4 V/4 VI/4 IV/4 VII2"],
+                },
+                "score": "w w x x w",
+            },
+            "rhythm": {
+                "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                "octave": 7,
+                "duration": 20,
+                "grammars": {
+                    "u": ['"I"/2 "V"/2 "vi"/2 "iii"/2 "IV"/2 "I"/2 "IV"/2 "V"/2 u u', "y"],
+                    "y": ['"I"/2 "vi" "IV"/2 "V"/2 y y u'],
+                },
+                "score": "u u y y u",
+            },
+        },
+        "d": {  # Movement block 'a' for reuse throughout the piece
+            "melody": {  # Instrument 'melody'
+                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                "octave": 8,
+                "duration": 24,
+                "grammars": {  # Notes for this instrument to use in this piece
+                    "u": ['I VII V III u', "y"],
+                    "w": ['VII I IV V VI u', 'w w'],
+                    "x": ['VI/4 III/4 II/4 I/4 w', 'x x'],
+                    "y": ["III/4 VI/4 II/4 V/4 VI/4 IV/4 VII2"],
+                },
+                "score": "w w x x w",
+            },
+            "rhythm": {
+                "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                "octave": 7,
+                "duration": 24,
                 "grammars": {
                     "u": ['"I" "V" "vi" "iii" "IV" "I" "IV" "V" u u', "y"],
                     "y": ['"I" "vi"2 "IV" "V" y y u'],
@@ -72,20 +124,26 @@ def main():
     }
 
     max_t = 0  # max time encountered so far. Used for movement timing
-    progression = "a b"
+    progression = "a b c d"
     for comp_name in progression.split():
-        instr_start_time = max_t
+        comp_start_time = max_t
         for instr_name, instr in composition[comp_name].iteritems():
             generated_score = generate_score(instr["score"], instr["grammars"])  # Fill in the scores by generating them based on the grammars
 #            print generated_score
             score = parse.parse(generated_score, default_octave=instr["octave"])  # Return Node/Chord objects
 
             # Generate timestamps for the notes 
-            t = instr_start_time
+            t = comp_start_time
             for note in range(len(score)):
                 score[note].time = t
                 score[note].duration *= tempo
                 t += score[note].duration
+#                print "time difference =", t-comp_start_time
+#                print "instrument duration =",composition[comp_name][instr_name]["duration"]
+                if (t-comp_start_time) > float(composition[comp_name][instr_name]["duration"]):
+#                    print "here"
+                    score = score[:note]
+                    break
                 max_t = t if t > max_t else max_t
             composition[comp_name][instr_name]["score"] = score
 
@@ -122,7 +180,8 @@ def generate_score(score, grammars):
                 found_substitution = True
                 while score.find(key) != -1:
                     score = score.replace(key, random.choice(grammars[key]), 1)
-                    if len(score.split()) > 200:
+#                    print scoe
+                    if len(score.split()) > 2000:
                         for k in grammars.keys():
                             score = score.replace(k, "")
                         return score
@@ -181,12 +240,10 @@ def generate_csound_score(score, score_line):
         if isinstance(token, parse.Chord):  # Chords
             for note in token.chord: 
                 note = csound_note_values[note]
-#                csound_score.append("i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6" % {"time": token.time, "octave": random.choice([7,8]), "note": note, "duration": token.duration})
                 csound_score.append(score_line % {"time": token.time, "octave": random.choice([7,8]), "note": note, "duration": token.duration})
         elif isinstance(token, parse.Note):  # Individual notes
             note = csound_note_values[token.value]
             csound_score.append(score_line % {"time": token.time, "octave": token.octave, "note": note, "duration": token.duration})
-#            csound_score.append("i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6" % {"time": token.time, "octave": random.choice([8,9]), "note": note, "duration": token.duration})
     return csound_score
 
 
