@@ -16,38 +16,38 @@ def main():
 
     composition = {
         "a": {  # Movement block 'a' for reuse throughout the piece
-            "melody": {  # Instrument 'melody'
-                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
-                "octave": 8,
+#            "melody": {  # Instrument 'melody'
+#                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+#                "octave": 8,
+#                "duration": 40,
+#                "grammars": {  # Notes for this instrument to use in this piece
+#                    "u": ["I V/2 V/2 V/2 I VII, IV' x u", "I IV w w", "I VII IV u u"],
+#                    "w": ['VII I IV V VI u', 'w w'],
+#                    "x": ['VI/4 III/4 II/4 I/4 w', 'x x'],
+#                },
+#                "score": "u",
+#            },
+#            "rhythm": {
+#                "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+#                "octave": 7,
+#                "duration": 50,
+#                "grammars": {
+#                    "u": ['"I" "ii"/4 "ii"/4 "IV"/2 "V"2 "IV" "ii" x u', '"I" "vii" "III" y u', '"I" "v" "IV" u u'],
+#                    "w": ['"i" "VII"2 "VI"/4 "V"/4 "i"/4 "VII"2 "VI" "V" w u'],
+#                    "x": ['"III/2" "VI"/2 "III"/2 "vii"2 "i"2 "V" u'],
+#                    "y": ['"I" "vi"2 "IV" "V" y y u'],
+#                },
+#                "score": "u x u y x w u",
+#            },
+            "timbre": {
+                "score_line": "i3 %(time)f %(duration)f 5000 %(octave)d.%(note)s 2 3 5 3",
+                "octave": 5,
                 "duration": 40,
                 "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["I V/2 V/2 V/2 I VII, IV' x u", "I IV w w", "I VII IV u u"],
-                    "w": ['VII I IV V VI u', 'w w'],
-                    "x": ['VI/4 III/4 II/4 I/4 w', 'x x'],
+                    "u": ['I2 I2 V VI I/2 IV/2 "V"2 "I"2']
                 },
-                "score": "u",
+                "score": "u u u u u",
             },
-            "rhythm": {
-                "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
-                "octave": 7,
-                "duration": 50,
-                "grammars": {
-                    "u": ['"I" "ii"/4 "ii"/4 "IV"/2 "V"2 "IV" "ii" x u', '"I" "vii" "III" y u', '"I" "v" "IV" u u'],
-                    "w": ['"i" "VII"2 "VI"/4 "V"/4 "i"/4 "VII"2 "VI" "V" w u'],
-                    "x": ['"III/2" "VI"/2 "III"/2 "vii"2 "i"2 "V" u'],
-                    "y": ['"I" "vi"2 "IV" "V" y y u'],
-                },
-                "score": "u x u y x w u",
-            },
-#            "bass": {
-#                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
-#                "octave": 5,
-#                "grammars": {  # Notes for this instrument to use in this piece
-#                    "u": ['"I" "V" "vi" "iii" "IV" "I" "IV" "V" u u' , "e"],
-#                    "e": [""],
-#                },
-#                "score": "u u u u u",
-#            },
         },
         "b": {  # Movement block 'a' for reuse throughout the piece
             "melody": {  # Instrument 'melody'
@@ -150,6 +150,7 @@ def main():
     # Must be done after all note times keyed in, else you can't coordinate melodies with the rhythm chords
     print '''f1  0  512  10  1
             f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
+            f3 0 1025 10 1
     '''
     for comp_name in progression.split():
         for instr_name, instr in composition[comp_name].iteritems():
@@ -240,7 +241,7 @@ def generate_csound_score(score, score_line):
         if isinstance(token, parse.Chord):  # Chords
             for note in token.chord: 
                 note = csound_note_values[note]
-                csound_score.append(score_line % {"time": token.time, "octave": random.choice([7,8]), "note": note, "duration": token.duration})
+                csound_score.append(score_line % {"time": token.time, "octave": token.octave, "note": note, "duration": token.duration})
         elif isinstance(token, parse.Note):  # Individual notes
             note = csound_note_values[token.value]
             csound_score.append(score_line % {"time": token.time, "octave": token.octave, "note": note, "duration": token.duration})

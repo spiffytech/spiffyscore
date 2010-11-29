@@ -11,12 +11,13 @@ class Note():
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
 class Chord():
-    def __init__(self, value, duration=.5, chord_type="major"):
+    def __init__(self, value, duration=.5, chord_type="major", octave=5):
         self.value = value
         self.duration = duration
         self.chord_type = chord_type
+        self.octave = octave
     def __repr__(self):
-        return "Chord %s %s %s" % (self.value, self.duration, self.chord_type)
+        return "Chord %s %s %s" % (self.value, self.duration, self.chord_type, self.octave)
 
 
 class Rest():
@@ -115,7 +116,7 @@ def parse(score, default_octave=8):
         '''
         pitch = p[2].value
         pitch = pitch.upper()
-        p[0] = Chord(value=pitch)
+        p[0] = Chord(value=pitch, octave=default_octave)
         if len(p) > 3:
             p[0].chord_type = p[3]
 
@@ -148,7 +149,7 @@ def parse(score, default_octave=8):
             p[0].duration = p[2]
 
     def p_error(p):
-        print "Syntax error at '%s' of element type %s" % (p.value, p.type)
+        raise Exception("Syntax error at '%s' of element type %s" % (p.value, p.type))
         
     yacc.yacc()
 
