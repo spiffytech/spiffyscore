@@ -19,11 +19,13 @@
 - [X] Chords don't respect octaves
 - [ ] Whole notes not held for proper duration
 
-* Structure [1/6]    
+* Structure [1/7]    
 - [ ] Chords should be composed of Notes, not ordinary arrays
 - [ ] There should be a Musical_Phrase object that holds phrases (and sets of
   phrases), and allows them to nest
 - [ ] Does each instrument need a score parameter if the grammars are non-terminating?
+- [ ] Duration should be in beats, not seconds. This ensures movements don't
+  end in the middle of a phrase.
 - [ ] Generate score with proper generation tools, not this string-replace nonsense
 - [X] Store csound score lines with instruments
 - [ ] Upgrade from simple string substitution for the score to something
