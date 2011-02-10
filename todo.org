@@ -10,6 +10,8 @@
 - [ ] Output score to separate file
 - [ ] Support parallel voices - ensure e.g. a certain chord progression is always
   accompanied by a certain melody
+- [ ] Syncopation
+- [ ] Sustain option for notes (give score notation a sustain symbol, and use it to set how long after the notes's duration to keep holding. With sustain, the next note's start time isn't done by when the current note ends. 
 
 * Bugs [5/6]
 - [X] TLD resets clock for each movement

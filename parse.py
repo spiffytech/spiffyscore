@@ -19,7 +19,6 @@ class Chord():
     def __repr__(self):
         return "Chord %s %s %s" % (self.value, self.duration, self.chord_type, self.octave)
 
-
 class Rest():
     def __init__(self, duration=.25):
         self.duration = duration
@@ -36,7 +35,8 @@ def parse(score, default_octave=8):
         "REST",
         "OCTAVE",
         "CHORD_TYPE",
-        "QUOTE",
+        "PAREN",
+        "SYNCOPATE",
     )
 
     t_ignore = " |"
@@ -47,7 +47,8 @@ def parse(score, default_octave=8):
     t_REST = r"z"
     t_OCTAVE = r"'+|,+"
     t_CHORD_TYPE = r"m|7|m7|0|o|\+|mb5|sus|sus4|maj7|mmaj7|7sus4|dim|dim7|7b5|m7b5|6|b6|m6|mb6|46|maj9|9|add9|7b9|m9"
-    t_QUOTE = '"'
+    t_PAREN = "\(|\)"
+    t_SYNCOPATE = "\+|-"
 
     def t_NOTE_LENGTH(t):
         r"/?\d+"
@@ -61,46 +62,25 @@ def parse(score, default_octave=8):
         raise TypeError("Unknown text '%s'" % (t.value,))
 
     lex.lex()
-
-    #lex.input("GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD")
-    #s = "GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD"
-    #s = '''I IV V VI I "I" "ii"/2'''
-    #s = "GF_G,/2"
     lex.input(score)
-    #for tok in iter(lex.token, None):
-    #    print repr(tok.type), repr(tok.value)
 
 
     # Parse (yacc)
 
-
-    def p_pitch_list(p):
+    def p_note_list(p):
         '''score : score note
-            | score chord
-            | score rest
+                 | score chord
+                 | score rest
         '''
         p[0] = p[1] + [p[2]]
 
     def p_score(p):
         '''score : note
-            | chord
-            | rest
+                 | chord
+                 | rest
         '''
         p[0] = [p[1]]
 
-
-    def p_note(p):
-        '''note : pitch
-        '''
-        p[0] = p[1]
-
-
-    def p_note_length(p):
-        ''' note : note NOTE_LENGTH
-        '''
-        new_note = p[1]
-        new_note.duration = p[2]
-        p[0] = new_note
 
     def p_chord_length(p):
         ''' chord : chord NOTE_LENGTH
@@ -110,9 +90,17 @@ def parse(score, default_octave=8):
         p[0] = new_note
 
 
+    def p_note_length(p):
+        ''' note : note NOTE_LENGTH
+        '''
+        new_note = p[1]
+        new_note.duration = p[2]
+        p[0] = new_note
+
+
     def p_chord(p):
-        '''chord : QUOTE pitch QUOTE
-                | QUOTE pitch CHORD_TYPE QUOTE
+        '''chord : PAREN note PAREN
+                 | PAREN note CHORD_TYPE PAREN
         '''
         pitch = p[2].value
         pitch = pitch.upper()
@@ -121,28 +109,34 @@ def parse(score, default_octave=8):
             p[0].chord_type = p[3]
 
 
+    def p_note_syncopate(p):
+        ''' note : note SYNCOPATE
+        '''
+        note.syncopate = p[2]
+
+
     def p_accidental(p):
-        '''pitch : ACCIDENTAL pitch
+        '''note : ACCIDENTAL note
         '''
         p[2].accidental = p[1]
         p[0] = p[2]
 
-    def p_pitch_octave(p):
-        '''pitch : pitch OCTAVE
+    def p_octave(p):
+        '''note : note OCTAVE
         '''
         count = len(p[2])
         increment_or_decrement = 1 if p[2].startswith("'") else -1
         p[1].octave += (count * increment_or_decrement)
         p[0] = p[1]
 
-    def p_pitch(p):
-        '''pitch : BASENOTE
+    def p_note(p):
+        '''note : BASENOTE
         '''
         p[0] = Note(p[1], octave=default_octave)
 
     def p_rest(p):
         ''' rest : REST
-                | REST NOTE_LENGTH
+                 | REST NOTE_LENGTH
         '''
         p[0] = Rest()
         if len(p) > 2:
@@ -153,5 +147,4 @@ def parse(score, default_octave=8):
         
     yacc.yacc()
 
-    #print yacc.parse("GFG B'AB,, | g/2fg gab | GFG BAB | d2A AFD")
     return yacc.parse(score)
