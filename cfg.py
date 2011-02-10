@@ -6,7 +6,10 @@ import random
 import sys
 import time
 random.seed(time.time())
+
 import parse
+import topsort
+import yaml
 
 def main():
     key = "A"
@@ -14,52 +17,44 @@ def main():
     tempo = 1/bps
     max_duration = 1
 
-    composition = {
-        "overview": {
-            "melody": {  # Instrument 'melody'
-                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
-                "octave": 8,
-                "duration": 40,
-                "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["I V/2 V/2 V/2 I VII, IV' I IV I VII IV"],
-                },
-                "score": "u",
-            },
-            "rhythm": {
-                "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
-                "octave": 7,
-                "duration": 44,
-                "grammars": {
-                    "u": ['(I) (ii)/4 (ii)/4 (IV)/2 (V)2 (IV) (ii) u', '(I) (vii) (III) u', '(I) (v) (IV) u u'],
-                },
-                "score": "u",
-            },
-        },
-    }
+    composition = yaml.load(open("score.yaml"))
 
     max_t = 0  # max time encountered so far. Used for movement timing
-    progression = "overview"
-    for comp_name in progression.split():
-        comp_start_time = max_t
-        for instr_name, instr in composition[comp_name].iteritems():
-            generated_score = generate_score(instr["score"], instr["grammars"])  # Fill in the scores by generating them based on the grammars
-#            print generated_score
-            score = parse.parse(generated_score, default_octave=instr["octave"])  # Return Node/Chord objects
+    progression = "chorus"
 
-            # Generate timestamps for the notes 
-            t = comp_start_time
-            for note in range(len(score)):
-                score[note].time = t
-                score[note].duration *= tempo
-                t += score[note].duration
-#                print "time difference =", t-comp_start_time
-#                print "instrument duration =",composition[comp_name][instr_name]["duration"]
-                if (t-comp_start_time) > float(composition[comp_name][instr_name]["duration"]):
-#                    print "here"
-                    score = score[:note]
-                    break
-                max_t = t if t > max_t else max_t
-            composition[comp_name][instr_name]["score"] = score
+    for movement in progression.split():
+        for section in ["intro", "core", "outro"]:
+            if section in composition[movement].keys():
+                try:
+                    render_order = topsort.topsort([[composition[movement][section][instrument]["sync"], instrument] if "sync" in composition[movement][section][instrument].keys() else [None, instrument] for instrument in composition[movement][section]])
+                except topsort.CycleError as ex:
+                    print "Your instruments are synced in a circle! This makes no sense!"
+                    print movement, section
+                    print ex
+                    sys.exit(1)
+                
+
+#    for comp_name in progression.split():
+#        comp_start_time = max_t
+#        for instr_name, instr in composition[comp_name].iteritems():
+#            generated_score = generate_score(instr["score"], instr["grammars"])  # Fill in the scores by generating them based on the grammars
+##            print generated_score
+#            score = parse.parse(generated_score, default_octave=instr["octave"])  # Return Node/Chord objects
+#
+#            # Generate timestamps for the notes 
+#            t = comp_start_time
+#            for note in range(len(score)):
+#                score[note].time = t
+#                score[note].duration *= tempo
+#                t += score[note].duration
+##                print "time difference =", t-comp_start_time
+##                print "instrument duration =",composition[comp_name][instr_name]["duration"]
+#                if (t-comp_start_time) > float(composition[comp_name][instr_name]["duration"]):
+##                    print "here"
+#                    score = score[:note]
+#                    break
+#                max_t = t if t > max_t else max_t
+#            composition[comp_name][instr_name]["score"] = score
 
     # Must be done after all note times keyed in, else you can't coordinate melodies with the rhythm chords
     print '''f1  0  512  10  1
