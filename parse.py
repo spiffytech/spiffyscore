@@ -42,7 +42,8 @@ def parse(score, default_octave=8):
     t_ignore = " |"
 
     #t_BASENOTE = r"[A-Ga-g]"
-    t_BASENOTE = r"I+V?|VI*|i+v?|vi*"
+#    t_BASENOTE = r"I+V?|VI*|i+v?|vi*"
+    t_BASENOTE = r"[A-Ga-g]"
     t_ACCIDENTAL = r"\^{1,2}|_{1,2}|="
     t_REST = r"z"
     t_OCTAVE = r"'+|,+"
