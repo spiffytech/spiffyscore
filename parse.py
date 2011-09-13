@@ -158,7 +158,7 @@ def parse(score, default_octave=8):
     def node(p):
         '''node: NODE
         '''
-        p[0] = tree.tree(node.strip("(").strip(")"))
+        p[0] = tree.Tree(node.strip("(").strip(")"))
 
 
     def p_error(p):

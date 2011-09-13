@@ -1,8 +1,9 @@
 import pdb
 
 class Tree():
-    def __init__(self):
+    def __init__(self, name):
         self.nodes = []
+        self.name = name
 
     def traverse_depth_first(self):
         all_nodes = []
