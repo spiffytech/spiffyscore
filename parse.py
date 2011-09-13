@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import tree
+
 from ply import lex, yacc
 class Note():
     def __init__(self, value, duration=.25, octave=8):
@@ -37,6 +39,7 @@ def parse(score, default_octave=8):
         "OCTAVE",
         "CHORD_TYPE",
         "QUOTE",
+        "NODE",
     )
 
     t_ignore = " |"
@@ -49,6 +52,7 @@ def parse(score, default_octave=8):
     t_OCTAVE = r"'+|,+"
     t_CHORD_TYPE = r"m|7|m7|0|o|\+|mb5|sus|sus4|maj7|mmaj7|7sus4|dim|dim7|7b5|m7b5|6|b6|m6|mb6|46|maj9|9|add9|7b9|m9"
     t_QUOTE = '"'
+    t_NODE = r"([a-zA-Z0-9_-]+)"
 
     def t_NOTE_LENGTH(t):
         r"/?\d+"
@@ -79,6 +83,7 @@ def parse(score, default_octave=8):
         '''score : score note
             | score chord
             | score rest
+            | score node
         '''
         p[0] = p[1] + [p[2]]
 
@@ -86,6 +91,7 @@ def parse(score, default_octave=8):
         '''score : note
             | chord
             | rest
+            | node
         '''
         p[0] = [p[1]]
 
@@ -148,6 +154,12 @@ def parse(score, default_octave=8):
         p[0] = Rest()
         if len(p) > 2:
             p[0].duration = p[2]
+
+    def node(p):
+        '''node: NODE
+        '''
+        p[0] = tree.tree(node.strip("(").strip(")"))
+
 
     def p_error(p):
         raise Exception("Syntax error at '%s' of element type %s" % (p.value, p.type))
