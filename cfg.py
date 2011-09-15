@@ -19,14 +19,25 @@ def main():
     max_duration = 1
 
     composition = {
-        "overview": {
+        "verse1": {
             "melody": {  # Instrument 'melody'
                 "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
                 "octave": 8,
                 "duration": 40,
                 "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["C G/2 G/2 G/2 C B, F' C F C B F (u)"],
-#                    "w": ['E/4 A/4 D/4 G/4 F/4 F/4 B2'],
+                    "u": ["C G/2 G/2 G/2 C B, F' C F C B F (w)"],
+                    "w": ['E/4 A/4 D/4 G/4 F/4 F/4 B2 (u)'],
+                },
+                "score": "u u",
+            },
+        },
+        "verse2": {
+            "melody": {  # Instrument 'melody'
+                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                "octave": 8,
+                "duration": 40,
+                "grammars": {  # Notes for this instrument to use in this piece
+                    "u": ["C C C C F/2 F/2 F/2 (u)"],
                 },
                 "score": "u u",
             },
@@ -35,17 +46,13 @@ def main():
     print '''f1  0  512  10  1
             f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
             f3 0 1025 10 1
+            t 0 60
     '''
     movement_start = 0
-
-
-    max_t = 0  # max time encountered so far. Used for movement timing
-    progression = "overview"
+    progression = "verse1 verse2"
     for comp_name in progression.split():
-        comp_start_time = max_t
         # We need an arbitrary grammar from this instrument to start the score with
         max_instr =  0
-        movement_start += max_instr
         for instr_name, instr in composition[comp_name].iteritems():
             for grammar in instr["grammars"]:
                 for g in range(len(instr["grammars"][grammar])):
@@ -55,7 +62,7 @@ def main():
 #            ins_score = instr["grammars"][g]
             score_complete = False
             while score_complete is False:
-                if score_len(ins_score) >= 50:
+                if score_len(ins_score) >= 10:
                     score_complete = True
                     break
                 for i in range(len(ins_score)):
@@ -71,35 +78,12 @@ def main():
             ins_score = [n for n in ins_score if not isinstance(n, tree.Tree)]
             composition[comp_name][instr_name]["score"] = ins_score
 
-            # Generate timestamps for the notes 
-#            t = comp_start_time
-#            for note in range(len(ins_score)):
-#                ins_score[note].time = t
-#                ins_score[note].duration *= tempo
-#                t += score[note].duration
-##                print "time difference =", t-comp_start_time
-##                print "instrument duration =",composition[comp_name][instr_name]["duration"]
-#                if (t-comp_start_time) > float(composition[comp_name][instr_name]["duration"]):
-##                    print "here"
-#                    ins_score = ins_score[:note]
-#                    break
-#                max_t = t if t > max_t else max_t
-#            composition[comp_name][instr_name]["score"] = ins_score
-
-    # Must be done after all note times keyed in, else you can't coordinate melodies with the rhythm chords
-#    for comp_name in progression.split():
-#        print "; Movement:", comp_name
-#        for instr_name, instr in composition[comp_name].iteritems():
-##            print "\nMovement %s instrument %s" % (comp_name, instr_name)
-##            print composition[comp_name][instr_name]["score"] 
-#            final_score = generate_csound_score(composition[comp_name][instr_name]["score"], composition[comp_name][instr_name]["score_line"])
-#            for line in final_score:
-#                print line
-
             if score_len(ins_score) > max_instr:
-                max_instr = ins_score
+                max_instr = score_len(ins_score)
             for line in generate_csound_score(composition[comp_name][instr_name]["score"], instr["score_line"], movement_start):
                 print line
+
+        movement_start += max_instr
 
 
 def score_len(score):
@@ -148,7 +132,6 @@ def generate_csound_score(score, score_line, t):
         "B": "11",
     }
     csound_score = []
-    pdb.set_trace()
     for token in score:
         if isinstance(token, parse.Chord):  # Chords
             for note in token.chord: 
