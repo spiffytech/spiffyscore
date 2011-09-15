@@ -44,15 +44,14 @@ def parse(score, default_octave=8):
 
     t_ignore = " |"
 
-    #t_BASENOTE = r"[A-Ga-g]"
-#    t_BASENOTE = r"I+V?|VI*|i+v?|vi*"
     t_BASENOTE = r"[A-Ga-g]"
+#    t_BASENOTE = r"I+V?|VI*|i+v?|vi*"
     t_ACCIDENTAL = r"\^{1,2}|_{1,2}|="
     t_REST = r"z"
     t_OCTAVE = r"'+|,+"
     t_CHORD_TYPE = r"m|7|m7|0|o|\+|mb5|sus|sus4|maj7|mmaj7|7sus4|dim|dim7|7b5|m7b5|6|b6|m6|mb6|46|maj9|9|add9|7b9|m9"
     t_QUOTE = '"'
-    t_NODE = r"([a-zA-Z0-9_-]+)"
+    t_NODE = r"\([a-zA-Z0-9_-]+\)"
 
     def t_NOTE_LENGTH(t):
         r"/?\d+"
@@ -155,13 +154,14 @@ def parse(score, default_octave=8):
         if len(p) > 2:
             p[0].duration = p[2]
 
-    def node(p):
-        '''node: NODE
+    def p_node(p):
+        '''node : NODE
         '''
-        p[0] = tree.Tree(node.strip("(").strip(")"))
+        p[0] = tree.Tree(p[1].strip("(").strip(")"))
 
 
     def p_error(p):
+        print p
         raise Exception("Syntax error at '%s' of element type %s" % (p.value, p.type))
         
     yacc.yacc()
