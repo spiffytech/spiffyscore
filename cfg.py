@@ -15,31 +15,46 @@ random.seed(time.time())
 def main():
     composition = {
         "verse1": {
-            "melody": {  # Instrument 'melody'
-                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
-                "octave": 8,
-                "duration": 10,
-                "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["C G/2 G/2 G/2 C B, F' C F C B F (w)"],
-                    "w": ["E/4 A/4 D/4 G/4 F/4 F/4 B2 (u)"],
+            "intro": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["G/2 G/2 G/4 G/4 A/4 A/4 A/2 G G A A A3 (w)"],
+                        "w": ["E E F F G/2 G/2 G3 (u)"],
+                    },
+                },
+            },
+            "body": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C G/2 G/2 G/2 C B, F' C F C B F (w)"],
+                        "w": ["E/4 A/4 D/4 G/4 F/4 F/4 B2 (u)"],
+                    },
                 },
             },
         },
         "verse2": {
-            "melody": {  # Instrument 'melody'
-                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
-                "octave": 8,
-                "duration": 10,
-                "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
+            "body": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
+                    },
                 },
-            },
-            "harmony": {  # Instrument 'melody'
-                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
-                "octave": 8,
-                "duration": 10,
-                "grammars": {  # Notes for this instrument to use in this piece
-                    "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
+                "harmony": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
+                    },
                 },
             },
         },
@@ -47,23 +62,33 @@ def main():
     print '''f1 0 512 10 1
 f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
 f3 0 1025 10 1
-t 0 60
+t 0 100
     '''
 
     section_start = 0
     for section in ["verse1", "verse2"]:
+        print "; Section " + section
+        subsection_start = section_start
         section = composition[section]
-#        for subsection in section
-        instrs = []
-        for instr in section.values():
-            sync = None
-            max_time = instr["duration"]
-            instr_score = render_instr(instr, sync, max_time)
-            instrs.append(instr_score)
-            for line in generate_csound_score(instr_score, instr["score_line"], section_start):
-                print line
-        longest_score = max(instrs, key=lambda i: score_len(i))
-        section_start += score_len(longest_score)
+        for subsection in ["intro", "body", "outro"]:
+            try:
+                print "; Subsection " + subsection
+                subsection = section[subsection]
+                instrs = []
+                for instr in subsection:
+                    print ";Instrument " + instr
+                    instr = subsection[instr]
+                    sync = None
+                    max_time = instr["duration"]
+                    instr_score = render_instr(instr, sync, max_time)
+                    instrs.append(instr_score)
+                    for line in generate_csound_score(instr_score, instr["score_line"], subsection_start):
+                        print line
+                longest_score = max(instrs, key=lambda i: score_len(i))
+                subsection_start += score_len(longest_score)
+                section_start += score_len(longest_score)
+            except KeyError:
+                pass
         
 
 
@@ -102,7 +127,7 @@ def choose_node(score, grammars, time_remaining, sync):
     if len(options) == 0:
         raise ValueError("No available grammars that will fit in the score")
     if sync:
-        
+        pass
     else:
         phrase = random.choice(options)
     score = score[:node_index-1] + phrase + score[node_index+1:]
