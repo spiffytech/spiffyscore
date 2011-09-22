@@ -4,7 +4,7 @@ import tree
 
 from ply import lex, yacc
 class Note():
-    def __init__(self, value, duration=.25, octave=8):
+    def __init__(self, value, duration=1, octave=8):
         self.value = value
         self.duration = duration
         self.octave = octave
@@ -13,7 +13,7 @@ class Note():
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
 class Chord():
-    def __init__(self, value, duration=.25, chord_type="major", octave=5):
+    def __init__(self, value, duration=1, chord_type="major", octave=5):
         self.value = value
         self.duration = duration
         self.chord_type = chord_type
@@ -23,7 +23,7 @@ class Chord():
 
 
 class Rest():
-    def __init__(self, duration=.25):
+    def __init__(self, duration=1):
         self.duration = duration
     def __repr__(self):
         return "Rest node %s" % self.duration
@@ -112,7 +112,7 @@ def parse(score, default_octave=8):
         ''' chord : chord NOTE_LENGTH
         '''
         new_note = p[1]
-        new_note.duration = 4*p[2]
+        new_note.duration = p[2]
         p[0] = new_note
 
 
@@ -152,7 +152,7 @@ def parse(score, default_octave=8):
         '''
         p[0] = Rest()
         if len(p) > 2:
-            p[0].duration = 4*p[2]
+            p[0].duration = p[2]
 
     def p_node(p):
         '''node : NODE
