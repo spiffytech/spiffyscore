@@ -4,7 +4,7 @@ import tree
 
 from ply import lex, yacc
 class Note():
-    def __init__(self, value, duration=.25, octave=8):
+    def __init__(self, value, duration=1 octave=8):
         self.value = value
         self.duration = duration
         self.octave = octave
@@ -13,7 +13,7 @@ class Note():
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
 class Chord():
-    def __init__(self, value, duration=.5, chord_type="major", octave=5):
+    def __init__(self, value, duration=1, chord_type="major", octave=5):
         self.value = value
         self.duration = duration
         self.chord_type = chord_type
