@@ -34,6 +34,14 @@ def main():
                     "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
                 },
             },
+            "harmony": {  # Instrument 'melody'
+                "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                "octave": 8,
+                "duration": 10,
+                "grammars": {  # Notes for this instrument to use in this piece
+                    "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
+                },
+            },
         },
     }
     print '''f1 0 512 10 1
@@ -43,7 +51,8 @@ t 0 60
     '''
 
     start = 0
-    for section in composition.values():
+    for section in ["verse1", "verse2"]:
+        section = composition[section]
 #        for subsection in section
         instrs = []
         for instr in section.values():
