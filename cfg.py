@@ -2,136 +2,193 @@
 
 from __future__ import division
 import os
+import pdb
 import random
 import sys
 import time
-random.seed(time.time())
 
 import parse
 import topsort
 import yaml
 
+import tree
+
+random.seed(time.time())
+
 def main():
-    key = "A"
-    bps = 60/60
-    tempo = 1/bps
-    max_duration = 1
-
-    composition = yaml.load(open("score.yaml"))
-
-    max_t = 0  # max time encountered so far. Used for movement timing
-    progression = "chorus"
-
-    for movement in progression.split():
-        for section in ["intro", "core", "outro"]:
-            if section in composition[movement].keys():
-                try:
-                    render_order = topsort.topsort([[composition[movement][section][instrument]["sync"], instrument] if "sync" in composition[movement][section][instrument].keys() else [None, instrument] for instrument in composition[movement][section]])
-                except topsort.CycleError as ex:
-                    print "Your instruments are synced in a circle! This makes no sense!"
-                    print movement, section
-                    print ex
-                    sys.exit(1)
-                
-
-#    for comp_name in progression.split():
-#        comp_start_time = max_t
-#        for instr_name, instr in composition[comp_name].iteritems():
-#            generated_score = generate_score(instr["score"], instr["grammars"])  # Fill in the scores by generating them based on the grammars
-##            print generated_score
-#            score = parse.parse(generated_score, default_octave=instr["octave"])  # Return Node/Chord objects
-#
-#            # Generate timestamps for the notes 
-#            t = comp_start_time
-#            for note in range(len(score)):
-#                score[note].time = t
-#                score[note].duration *= tempo
-#                t += score[note].duration
-##                print "time difference =", t-comp_start_time
-##                print "instrument duration =",composition[comp_name][instr_name]["duration"]
-#                if (t-comp_start_time) > float(composition[comp_name][instr_name]["duration"]):
-##                    print "here"
-#                    score = score[:note]
-#                    break
-#                max_t = t if t > max_t else max_t
-#            composition[comp_name][instr_name]["score"] = score
-
-    # Must be done after all note times keyed in, else you can't coordinate melodies with the rhythm chords
-    print '''f1  0  512  10  1
-            f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
-            f3 0 1025 10 1
+    composition = {
+        "fm_test": {
+            "intro": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2 6 5 1",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["G/2 G/2 | G/4 G/4 A/4 A/4 | A/2 A/2 | G | G | A | A | A3 (w)"],
+                        "w": ["E | E | F | F | G/2 G/2 | G3 (u)"],
+                    },
+                },
+            },
+        },
+        "verse1": {
+            "intro": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["G/2 G/2 | G/4 G/4 A/4 A/4 | A/2 A/2 | G | G | A | A | A3 (w)"],
+                        "w": ["E | E | F | F | G/2 G/2 | G3 (u)"],
+                    },
+                },
+            },
+            "body": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C | G/2 G/2 | G/2 G/2 | C | B, | F' | C | F | C | B | F | (w)"],
+                        "w": ["E/4 A/4 D/4 G/4 | F/4 F/4 B2 | (u)"],
+                    },
+                },
+            },
+            "outro": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/4 C/4 C/4 C/4 | z2"],
+                    },
+                },
+            },
+        },
+        "verse2": {
+            "body": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C | C | C | C | F/2 F/2 | F/2 F/2 | (u)", "D | D | G/2 A/2 | D | D | (u)"],
+                    },
+                },
+                "harmony": {  # Instrument 'melody'
+                    "score_line": "i3 %(time)f %(duration)f 4000 %(octave)d.%(note)s 2 3 5 3",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C | C | z | C | C | z/2 F/4 F/2 F/2 | F/2 F/2 | z (u)", "D | D | G/2 A/2 | D | D | z (u)"],
+                    },
+                },
+                "percussion": {  # Instrument 'melody'
+                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/4 C/4 C/4 C/4 | F/2 F/2 | F/2 F/2 | (u)", "D/4 D/4 G/4 A/4 | D | D | (v)"],
+                        "v": ["C | D | E | F | E | D | C | (u)",],
+                    },
+                },
+            },
+            "outro": {
+                "percussion": {  # Instrument 'melody'
+                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/4 C/4 C/4 C/4"],
+                    },
+                },
+            },
+        },
+    }
+    print '''f1 0 512 10 1
+f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
+f3 0 1025 10 1
+t 0 100
     '''
-    for comp_name in progression.split():
-        print "; Movement:", comp_name
-        for instr_name, instr in composition[comp_name].iteritems():
-            composition[comp_name][instr_name]["score"] = transliterate_score(composition[comp_name][instr_name]["score"], key)
-#            print "\nMovement %s instrument %s" % (comp_name, instr_name)
-#            print composition[comp_name][instr_name]["score"] 
-            final_score = generate_csound_score(composition[comp_name][instr_name]["score"], composition[comp_name][instr_name]["score_line"])
-            for line in final_score:
-                print line
-            
 
-def make_scale(key):
-    notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
-    scale = [key]
-    pos = notes.index(key)
-    progression = [2,2,1,2,2,2,1]
-    for p in progression:
-        pos = (pos + p) % 12
-        scale.append(notes[pos])
-    return scale
+    section_start = 0
+#    for section in ["verse1", "verse2"]:
+    for section in ["fm_test"]:
+        print "; Section " + section
+        subsection_start = section_start
+        section = composition[section]
+        for subsection in ["intro", "body", "outro"]:
+            try:
+                print "; Subsection " + subsection
+                subsection = section[subsection]
+                instrs = []
+                for instr in subsection:
+                    print ";Instrument " + instr
+                    instr = subsection[instr]
+                    sync = None
+                    max_time = instr["duration"]
+                    instr_score = render_instr(instr, sync, max_time)
+                    instrs.append(instr_score)
+                    for line in generate_csound_score(instr_score, instr["score_line"], subsection_start):
+                        print line
+                longest_score = max(instrs, key=lambda i: score_len(i))
+                subsection_start += score_len(longest_score)
+                section_start += score_len(longest_score)
+            except KeyError:
+                pass
+        
 
 
-def generate_score(score, grammars):
-    while 1:
-        found_substitution = False
-        for key,value in grammars.iteritems():
-            if score.find(key) != -1:
-                found_substitution = True
-                while score.find(key) != -1:
-                    score = score.replace(key, random.choice(grammars[key]), 1)
-#                    print scoe
-                    if len(score.split()) > 2000:
-                        for k in grammars.keys():
-                            score = score.replace(k, "")
-                        return score
-        if found_substitution is False:
+def render_instr(instr, sync, max_time):
+    grammars = instr["grammars"]
+    for g in instr["grammars"]:
+        for i in range(len(grammars[g])):
+            grammars[g][i] = parse.parse(grammars[g][i])
+    init_node = random.choice(instr["grammars"].keys())
+    init_score = random.choice(instr["grammars"][init_node])
+    score = init_score
+    while True:
+        time_remaining = max_time - score_len(score)
+        try:
+            score = choose_node(score, grammars, time_remaining, sync)
+        except ValueError:
             break
     return score
 
-def transliterate_score(score, key):
-    scale = make_scale(key)
-    scale_conversion = {
-        "I": 1,
-        "II": 2,
-        "III": 3,
-        "IV": 4,
-        "V": 5,
-        "VI": 6,
-        "VII": 7,
-        "VIII": 8,
-    }
-    keyed_score = []
-    for i in range(len(score)):
-        if isinstance(score[i], parse.Note):
-            score[i].value = scale[scale_conversion[score[i].value]-1]
-        elif isinstance(score[i], parse.Chord):
-            chord = []
-            root_note_index = scale.index(key) + scale_conversion[score[i].value]
-            chord.append(scale[root_note_index])
-            chord.append(scale[(root_note_index+3) % 8])
-            if score[i].chord_type == "m":  # Minor chords, flat the 5th
-                chord.append(scale[(root_note_index+4) % 8])
-            else:
-                chord.append(scale[(root_note_index+5) % 8])
-            score[i].chord = chord
-        elif isinstance(score[i], parse.Rest):
-            pass
+
+def choose_node(score, grammars, time_remaining, sync):
+    if time_remaining <= 0:
+        raise ValueError("No time remaining in the score")
+    node = None
+    node_index = None
+    for item in range(len(score)):
+        if isinstance(score[item], tree.Tree):
+            node = score[item].name
+            node_index = item
+    if node is None:
+        raise ValueError("No more nodes to fill in")
+    options = []
+    for g in range(len(grammars[node])):
+        if score_len(grammars[node][g]) <= time_remaining:
+            options.append(grammars[node][g])
+    if len(options) == 0:
+        raise ValueError("No available grammars that will fit in the score")
+    if sync:
+        pass
+    else:
+        phrase = random.choice(options)
+    score = score[:node_index-1] + phrase + score[node_index+1:]
     return score
 
 
-def generate_csound_score(score, score_line):
+def score_len(score):
+    total = 0
+    for n in score:
+        if not isinstance(n, tree.Tree):
+            total += n.duration
+    return total
+
+
+def generate_csound_score(score, score_line, t):
     csound_note_values = {
         "C": "00",
         "C#": "01",
@@ -151,10 +208,13 @@ def generate_csound_score(score, score_line):
         if isinstance(token, parse.Chord):  # Chords
             for note in token.chord: 
                 note = csound_note_values[note]
-                csound_score.append(score_line % {"time": token.time, "octave": token.octave, "note": note, "duration": token.duration})
+                csound_score.append(score_line % {"time": t, "octave": token.octave, "note": note, "duration": token.duration})
         elif isinstance(token, parse.Note):  # Individual notes
             note = csound_note_values[token.value]
-            csound_score.append(score_line % {"time": token.time, "octave": token.octave, "note": note, "duration": token.duration})
+            csound_score.append(score_line % {"time": t, "octave": token.octave, "note": note, "duration": token.duration})
+        elif isinstance(token, tree.Tree):
+            continue
+        t += token.duration
     return csound_score
 
 

@@ -1,0 +1,39 @@
+---
+chorus:
+    core:
+        rhythm:
+            csound_line: i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6
+            max_duration: 80
+            sync: timbre
+            octave: 7
+            sustain: 1
+            grammars:
+                u: 
+                    - (I) (ii)/4 (ii)/4 (IV)/2 (V)2 (IV) (ii) x u
+                    - (I) (vii) (III) y u
+                    - (I) (v) (IV) u u
+                w: (i) (VII)2 (VI)/4 (V)/4 (i)/4 (VII)2 (VI) (V) w u
+                x: (III/2) (VI)/2 (III)/2 (vii)2 (i)2 (V) u
+                y: (I) (vi)2 (IV) (V) y y u
+
+        timbre:
+            csound_line: i3 %(time)f %(duration)f 2000 %(octave)d.%(note)s 2 3 5 3
+            max_duration: 80
+            sync: melody
+            sustain: 1
+            octave: 6
+            grammars:
+                u: 
+                    - I2+ VII2 V2 VI2 I2 IV/2 V/2 III2 u
+                    - I2- IV2 V2 IV I V2 III2 II2. u
+
+        melody:
+            csound_line: i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2
+            max_duration: 80
+            octave: 8
+            grammars: 
+                u: 
+                    - I V/2 V/2 V/2 I VII
+                    - IV' I IV I VII IV
+                w: III/4 VI/4 II/4 V/4 VI/4 IV/4 VII2
+                x: I/2 I/2 VI IV/2 V2 z I/2 I/2 VI IV/2 V

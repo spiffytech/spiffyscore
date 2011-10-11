@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
+import tree
+
 from ply import lex, yacc
 class Note():
-    def __init__(self, value, duration=.25, octave=8):
+    def __init__(self, value, duration=1, octave=8):
         self.value = value
         self.duration = duration
         self.octave = octave
@@ -11,7 +13,7 @@ class Note():
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
 class Chord():
-    def __init__(self, value, duration=.5, chord_type="major", octave=5):
+    def __init__(self, value, duration=1, chord_type="major", octave=5):
         self.value = value
         self.duration = duration
         self.chord_type = chord_type
@@ -20,7 +22,7 @@ class Chord():
         return "Chord %s %s %s" % (self.value, self.duration, self.chord_type, self.octave)
 
 class Rest():
-    def __init__(self, duration=.25):
+    def __init__(self, duration=1):
         self.duration = duration
     def __repr__(self):
         return "Rest node %s" % self.duration
@@ -37,18 +39,20 @@ def parse(score, default_octave=8):
         "CHORD_TYPE",
         "PAREN",
         "SYNCOPATE",
+        "NODE",
     )
 
     t_ignore = " |"
 
-    #t_BASENOTE = r"[A-Ga-g]"
-    t_BASENOTE = r"I+V?|VI*|i+v?|vi*"
+    t_BASENOTE = r"[A-Ga-g]"
+#    t_BASENOTE = r"I+V?|VI*|i+v?|vi*"
     t_ACCIDENTAL = r"\^{1,2}|_{1,2}|="
     t_REST = r"z"
     t_OCTAVE = r"'+|,+"
     t_CHORD_TYPE = r"m|7|m7|0|o|\+|mb5|sus|sus4|maj7|mmaj7|7sus4|dim|dim7|7b5|m7b5|6|b6|m6|mb6|46|maj9|9|add9|7b9|m9"
     t_PAREN = "\(|\)"
     t_SYNCOPATE = "\+|-"
+    t_NODE = r"\([a-zA-Z0-9_-]+\)"
 
     def t_NOTE_LENGTH(t):
         r"/?\d+"
@@ -71,6 +75,7 @@ def parse(score, default_octave=8):
         '''score : score note
                  | score chord
                  | score rest
+            | score node
         '''
         p[0] = p[1] + [p[2]]
 
@@ -78,6 +83,7 @@ def parse(score, default_octave=8):
         '''score : note
                  | chord
                  | rest
+            | node
         '''
         p[0] = [p[1]]
 
@@ -142,7 +148,14 @@ def parse(score, default_octave=8):
         if len(p) > 2:
             p[0].duration = p[2]
 
+    def p_node(p):
+        '''node : NODE
+        '''
+        p[0] = tree.Tree(p[1].strip("(").strip(")"))
+
+
     def p_error(p):
+        print p
         raise Exception("Syntax error at '%s' of element type %s" % (p.value, p.type))
         
     yacc.yacc()
