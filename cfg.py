@@ -14,26 +14,49 @@ random.seed(time.time())
 
 def main():
     composition = {
-        "verse1": {
+        "fm_test": {
             "intro": {
                 "melody": {  # Instrument 'melody'
-                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2 6 5 1",
                     "octave": 8,
                     "duration": 10,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["G/2 G/2 G/4 G/4 A/4 A/4 A/2 G G A A A3 (w)"],
-                        "w": ["E E F F G/2 G/2 G3 (u)"],
+                        "u": ["G/2 G/2 | G/4 G/4 A/4 A/4 | A/2 A/2 | G | G | A | A | A3 (w)"],
+                        "w": ["E | E | F | F | G/2 G/2 | G3 (u)"],
+                    },
+                },
+            },
+        },
+        "verse1": {
+            "intro": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["G/2 G/2 | G/4 G/4 A/4 A/4 | A/2 A/2 | G | G | A | A | A3 (w)"],
+                        "w": ["E | E | F | F | G/2 G/2 | G3 (u)"],
                     },
                 },
             },
             "body": {
                 "melody": {  # Instrument 'melody'
-                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
                     "octave": 8,
                     "duration": 10,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C G/2 G/2 G/2 C B, F' C F C B F (w)"],
-                        "w": ["E/4 A/4 D/4 G/4 F/4 F/4 B2 (u)"],
+                        "u": ["C | G/2 G/2 | G/2 G/2 | C | B, | F' | C | F | C | B | F | (w)"],
+                        "w": ["E/4 A/4 D/4 G/4 | F/4 F/4 B2 | (u)"],
+                    },
+                },
+            },
+            "outro": {
+                "melody": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
+                    "octave": 8,
+                    "duration": 10,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/4 C/4 C/4 C/4 | z2"],
                     },
                 },
             },
@@ -41,19 +64,38 @@ def main():
         "verse2": {
             "body": {
                 "melody": {  # Instrument 'melody'
-                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
                     "octave": 8,
-                    "duration": 10,
+                    "duration": 30,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
+                        "u": ["C | C | C | C | F/2 F/2 | F/2 F/2 | (u)", "D | D | G/2 A/2 | D | D | (u)"],
                     },
                 },
                 "harmony": {  # Instrument 'melody'
-                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 2",
+                    "score_line": "i3 %(time)f %(duration)f 4000 %(octave)d.%(note)s 2 3 5 3",
                     "octave": 8,
-                    "duration": 10,
+                    "duration": 30,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C C C C F/2 F/2 F/2 (u)", "D D G/2 A/2 D D (u)"],
+                        "u": ["C | C | z | C | C | z/2 F/4 F/2 F/2 | F/2 F/2 | z (u)", "D | D | G/2 A/2 | D | D | z (u)"],
+                    },
+                },
+                "percussion": {  # Instrument 'melody'
+                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/4 C/4 C/4 C/4 | F/2 F/2 | F/2 F/2 | (u)", "D/4 D/4 G/4 A/4 | D | D | (v)"],
+                        "v": ["C | D | E | F | E | D | C | (u)",],
+                    },
+                },
+            },
+            "outro": {
+                "percussion": {  # Instrument 'melody'
+                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/4 C/4 C/4 C/4"],
                     },
                 },
             },
@@ -66,7 +108,8 @@ t 0 100
     '''
 
     section_start = 0
-    for section in ["verse1", "verse2"]:
+#    for section in ["verse1", "verse2"]:
+    for section in ["fm_test"]:
         print "; Section " + section
         subsection_start = section_start
         section = composition[section]

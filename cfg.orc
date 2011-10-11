@@ -17,3 +17,7 @@ instr 3
     asound foscili p4, cpspch(p5), 5, 2, 3, p9
     out asound
 endin
+
+instr 4
+    aFMinst foscili p4, cpspch(p5), p6, p7, p8, p9
+endin
