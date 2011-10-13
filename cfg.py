@@ -120,8 +120,16 @@ t 0 100
             try:
                 print "; Subsection " + subsection
                 subsection = section[subsection]
-                instrs = []
+                unordered_instrs = []
                 for instr in subsection:
+                    if not "sync" in subsection[instr]:
+                        subsection[instr]["sync"] = None
+                    unordered_instrs.append([subsection[instr]["sync"], instr])
+                ordered_instrs = topsort.topsort(unordered_instrs)
+                ordered_instrs.remove(None)
+                pdb.set_trace()
+                instrs = []
+                for instr in ordered_instrs:
                     print ";Instrument " + instr
                     instr = subsection[instr]
                     sync = None
