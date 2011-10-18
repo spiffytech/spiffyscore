@@ -2,7 +2,7 @@
 
 from __future__ import division
 import os
-import pdb
+import ipdb
 import random
 import sys
 import time
@@ -103,6 +103,29 @@ def main():
                 },
             },
         },
+        "sync_test": {
+            "body": {
+                "lead_instr": {  # Instrument 'melody'
+                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["D/4 D/4 D/4 D/4"],
+                        "v": ["C/4 C/4 C/4 C/4"],
+                    },
+                },
+                "follow_instr": {  # Instrument 'melody'
+                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
+                    "sync": "lead_instr",
+                    "octave": 8,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["D/4 D/4 D/4 D/4"],
+                        "v": ["C/4 C/4 C/4 C/4"],
+                    },
+                },
+            },
+        },
     }
     print '''f1 0 512 10 1
 f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
@@ -112,7 +135,7 @@ t 0 100
 
     section_start = 0
 #    for section in ["verse1", "verse2"]:
-    for section in ["fm_test"]:
+    for section in ["sync_test"]:
         print "; Section " + section
         subsection_start = section_start
         section = composition[section]
@@ -120,21 +143,23 @@ t 0 100
             try:
                 print "; Subsection " + subsection
                 subsection = section[subsection]
+
                 unordered_instrs = []
                 for instr in subsection:
-                    if not "sync" in subsection[instr]:
+                    if not "sync" in subsection[instr].keys():
                         subsection[instr]["sync"] = None
                     unordered_instrs.append([subsection[instr]["sync"], instr])
                 ordered_instrs = topsort.topsort(unordered_instrs)
-                ordered_instrs.remove(None)
-                pdb.set_trace()
+                ordered_instrs.remove(None)  # None used as a placeholder for sort order for instruments with no sync setting
+
                 instrs = []
+                syncs = {}
                 for instr in ordered_instrs:
                     print ";Instrument " + instr
                     instr = subsection[instr]
-                    sync = None
+#                    ipdb.set_trace()
                     max_time = instr["duration"]
-                    instr_score = render_instr(instr, sync, max_time)
+                    instr_score, syncs = render_instr(instr, syncs, max_time)
                     instrs.append(instr_score)
                     for line in generate_csound_score(instr_score, instr["score_line"], subsection_start):
                         print line
@@ -143,29 +168,35 @@ t 0 100
                 section_start += score_len(longest_score)
             except KeyError:
                 pass
-        
 
 
-def render_instr(instr, sync, max_time):
-    grammars = instr["grammars"]
+def render_instr(instr, syncs, max_time):
     for g in instr["grammars"]:
-        for i in range(len(grammars[g])):
-            grammars[g][i] = parse.parse(grammars[g][i])
-    init_node = random.choice(instr["grammars"].keys())
-    init_score = random.choice(instr["grammars"][init_node])
-    score = init_score
+        for i in range(len(instr["grammars"][g])):
+            instr["grammars"][g][i] = parse.parse(instr["grammars"][g][i])
+    score = []
     while True:
+#        ipdb.set_trace()
         time_remaining = max_time - score_len(score)
         try:
-            score = choose_node(score, grammars, time_remaining, sync)
+            score, syncs = choose_node(score, instr, time_remaining, syncs)
         except ValueError:
             break
-    return score
+    return (score, syncs)
 
 
-def choose_node(score, grammars, time_remaining, sync):
+def choose_node(score, instr, time_remaining, syncs):
+#    ipdb.set_trace()
+    grammars = instr["grammars"]
     if time_remaining <= 0:
         raise ValueError("No time remaining in the score")
+
+    if len(score) == 0:
+        options = get_node_choices(instr, syncs, score_len(score))
+        node = random.choice(options)
+        phrase = random.choice(instr["grammars"][node])
+
+    # Find the next node in the score that needs choosing
     node = None
     node_index = None
     for item in range(len(score)):
@@ -174,18 +205,41 @@ def choose_node(score, grammars, time_remaining, sync):
             node_index = item
     if node is None:
         raise ValueError("No more nodes to fill in")
-    options = []
-    for g in range(len(grammars[node])):
-        if score_len(grammars[node][g]) <= time_remaining:
-            options.append(grammars[node][g])
-    if len(options) == 0:
-        raise ValueError("No available grammars that will fit in the score")
-    if sync:
-        pass
-    else:
-        phrase = random.choice(options)
+
+    options = get_node_choices(instr, syncs, score_len(score))
+    node = random.choice(options)
+    phrase = random.choice(instr["grammars"][node])
     score = score[:node_index-1] + phrase + score[node_index+1:]
     return score
+
+
+def get_node_choices(instr, syncs, current_time):
+    # If this instrument should follow another, choose a grammar node from the correct instrument
+#    ipdb.set_trace()
+    grammars = instr["grammars"]
+    options = []
+    if instr["sync"] is not None:
+        guiding_instr = instr["sync"]
+        sync_node = get_sync_node_at_time(syncs[guiding_instr], current_time)
+        if sync_node in instr["grammars"].keys():
+            options.append(sync_node)
+        else:
+            for g in range(len(grammars[node])):
+                if score_len(grammars[node][g]) <= time_remaining:
+                    options.append(grammars[node][g])
+    else:
+        for g in range(len(grammars[node])):
+            if score_len(grammars[node][g]) <= time_remaining:
+                options.append(grammars[node][g])
+    if len(options) == 0:
+        raise ValueError("No available grammars that will fit in the score")
+    return options
+
+
+def get_sync_node_at_time(syncs, t):
+    for s in len(syncs):
+        if syncs[s]["time"] > t:
+            return syncs[s]["node"]
 
 
 def score_len(score):
