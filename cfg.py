@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import os
 import ipdb
+import os
 import random
 import sys
 import time
@@ -146,6 +146,7 @@ t 0 100
 
                 unordered_instrs = []
                 for instr in subsection:
+                    subsection[instr]["name"] = instr
                     if not "sync" in subsection[instr].keys():
                         subsection[instr]["sync"] = None
                     unordered_instrs.append([subsection[instr]["sync"], instr])
@@ -157,7 +158,6 @@ t 0 100
                 for instr in ordered_instrs:
                     print ";Instrument " + instr
                     instr = subsection[instr]
-#                    ipdb.set_trace()
                     max_time = instr["duration"]
                     instr_score, syncs = render_instr(instr, syncs, max_time)
                     instrs.append(instr_score)
@@ -174,71 +174,64 @@ def render_instr(instr, syncs, max_time):
     for g in instr["grammars"]:
         for i in range(len(instr["grammars"][g])):
             instr["grammars"][g][i] = parse.parse(instr["grammars"][g][i])
-    score = []
-    while True:
+
+    score= []
+    try:
+        score, syncs = choose_phrase(instr, syncs, 0, max_time)
+
+        while True:
+            score_index_to_replace = None
+            for item in range(len(score)):  # Optimize this by caching the index of the last node I replaced and startng there
+                if isinstance(score[item], tree.Tree):
+                    score_index_to_replace = item
+            if score_index_to_replace is None:
+                raise ValueError("No more nodes to fill in")
+
+            time_remaining = max_time - score_len(score)
+            new_phrase, syncs = choose_phrase(instr, syncs, score_len(score), time_remaining)
+            score = score[:node_index-1] + new_phrase + score[node_index+1:]
+
+    except ValueError:
+        return (score, syncs)
+
+
+def choose_phrase(instr, syncs, current_time, time_remaining):
+    '''Filters grammars for ones that match the sync option, and phrases that fit the time remaining in the score'''
+    time_filtered_grammars = {}
+    for grammar in instr["grammars"]:
+        time_filtered_grammars[grammar] = get_phrases_that_fit(instr["grammars"][grammar], time_remaining)
+    if len(time_filtered_grammars.keys()) == 0:
+        raise ValueError("No available grammars that will fit in the score")
+
+    grammar = None
+#    if instr["name"] == "follow_instr":
 #        ipdb.set_trace()
-        time_remaining = max_time - score_len(score)
-        try:
-            score, syncs = choose_node(score, instr, time_remaining, syncs)
-        except ValueError:
-            break
-    return (score, syncs)
-
-
-def choose_node(score, instr, time_remaining, syncs):
-#    ipdb.set_trace()
-    grammars = instr["grammars"]
-    if time_remaining <= 0:
-        raise ValueError("No time remaining in the score")
-
-    if len(score) == 0:
-        options = get_node_choices(instr, syncs, score_len(score))
-        node = random.choice(options)
-        phrase = random.choice(instr["grammars"][node])
-
-    # Find the next node in the score that needs choosing
-    node = None
-    node_index = None
-    for item in range(len(score)):
-        if isinstance(score[item], tree.Tree):
-            node = score[item].name
-            node_index = item
-    if node is None:
-        raise ValueError("No more nodes to fill in")
-
-    options = get_node_choices(instr, syncs, score_len(score))
-    node = random.choice(options)
-    phrase = random.choice(instr["grammars"][node])
-    score = score[:node_index-1] + phrase + score[node_index+1:]
-    return score
-
-
-def get_node_choices(instr, syncs, current_time):
-    # If this instrument should follow another, choose a grammar node from the correct instrument
-#    ipdb.set_trace()
-    grammars = instr["grammars"]
-    options = []
     if instr["sync"] is not None:
         guiding_instr = instr["sync"]
         sync_node = get_sync_node_at_time(syncs[guiding_instr], current_time)
-        if sync_node in instr["grammars"].keys():
-            options.append(sync_node)
-        else:
-            for g in range(len(grammars[node])):
-                if score_len(grammars[node][g]) <= time_remaining:
-                    options.append(grammars[node][g])
-    else:
-        for g in range(len(grammars[node])):
-            if score_len(grammars[node][g]) <= time_remaining:
-                options.append(grammars[node][g])
-    if len(options) == 0:
-        raise ValueError("No available grammars that will fit in the score")
-    return options
+        if sync_node in time_filtered_grammars.keys():
+            grammar = sync_node
+    if grammar is None:
+        grammar = random.choice(time_filtered_grammars.keys())
+    phrases = time_filtered_grammars[grammar]
+    if instr["name"] not in syncs.keys():
+        syncs[instr["name"]] = []
+    syncs[instr["name"]].append({"node": grammar, "time": current_time})
+
+    return random.choice(phrases), syncs
+
+
+def get_phrases_that_fit(grammar, time_remaining):
+    valid_phrases = []
+    for phrase in grammar:
+        if score_len(phrase) <= time_remaining:
+            valid_phrases.append(phrase)
+    return valid_phrases
 
 
 def get_sync_node_at_time(syncs, t):
-    for s in len(syncs):
-        if syncs[s]["time"] > t:
+    for s in range(len(syncs)):
+        if syncs[s]["time"] >= t:
             return syncs[s]["node"]
 
 
