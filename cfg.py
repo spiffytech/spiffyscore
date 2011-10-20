@@ -110,8 +110,8 @@ def main():
                     "octave": 8,
                     "duration": 30,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["D/4 D/4 D/4 D/4"],
-                        "v": ["C/4 C/4 C/4 C/4"],
+                        "u": ["D/4 D/4 D/4 D/4 (u)"],
+                        "v": ["C/4 C/4 C/4 C/4 (v)"],
                     },
                 },
                 "follow_instr": {  # Instrument 'melody'
@@ -120,8 +120,8 @@ def main():
                     "octave": 8,
                     "duration": 30,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["D/4 D/4 D/4 D/4"],
-                        "v": ["C/4 C/4 C/4 C/4"],
+                        "u": ["D/4 D/4 D/4 D/4 (u)"],
+                        "v": ["C/4 C/4 C/4 C/4 (v)"],
                     },
                 },
             },
@@ -189,7 +189,7 @@ def render_instr(instr, syncs, max_time):
 
             time_remaining = max_time - score_len(score)
             new_phrase, syncs = choose_phrase(instr, syncs, score_len(score), time_remaining)
-            score = score[:node_index-1] + new_phrase + score[node_index+1:]
+            score = score[:score_index_to_replace-1] + new_phrase + score[score_index_to_replace+1:]
 
     except ValueError:
         return (score, syncs)
@@ -199,13 +199,13 @@ def choose_phrase(instr, syncs, current_time, time_remaining):
     '''Filters grammars for ones that match the sync option, and phrases that fit the time remaining in the score'''
     time_filtered_grammars = {}
     for grammar in instr["grammars"]:
-        time_filtered_grammars[grammar] = get_phrases_that_fit(instr["grammars"][grammar], time_remaining)
+         fitting_phrases = get_phrases_that_fit(instr["grammars"][grammar], time_remaining)
+         if len(fitting_phrases) > 0:
+            time_filtered_grammars[grammar] = fitting_phrases
     if len(time_filtered_grammars.keys()) == 0:
         raise ValueError("No available grammars that will fit in the score")
 
     grammar = None
-#    if instr["name"] == "follow_instr":
-#        ipdb.set_trace()
     if instr["sync"] is not None:
         guiding_instr = instr["sync"]
         sync_node = get_sync_node_at_time(syncs[guiding_instr], current_time)
