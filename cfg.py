@@ -189,7 +189,7 @@ def render_instr(instr, syncs, max_time):
 
             time_remaining = max_time - score_len(score)
             new_phrase, syncs = choose_phrase(instr, syncs, score_len(score), time_remaining, score)
-            score = score[:score_index_to_replace-1] + new_phrase + score[score_index_to_replace+1:]
+            score = score[:score_index_to_replace] + new_phrase + score[score_index_to_replace+1:]
 
     except ValueError:
         return (score, syncs)
