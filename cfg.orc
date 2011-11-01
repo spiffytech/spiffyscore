@@ -2,40 +2,71 @@ sr=44100
 ksmps=20
 nchnls=1
 
-gifn ftgen 105, 0, 524288, -1,  "samples/bass/1.05.wav", 0, 0, 1 ; Middle C
-gifn ftgen 106, 0, 524288, -1,  "samples/bass/1.06.wav", 0, 0, 1 ; Middle C
-gifn ftgen 107, 0, 524288, -1,  "samples/bass/1.07.wav", 0, 0, 1 ; Middle C
-gifn ftgen 108, 0, 524288, -1,  "samples/bass/1.08.wav", 0, 0, 1 ; Middle C
-gifn ftgen 109, 0, 524288, -1,  "samples/bass/1.09.wav", 0, 0, 1 ; Middle C
-gifn ftgen 110, 0, 524288, -1,  "samples/bass/1.10.wav", 0, 0, 1 ; Middle C
-gifn ftgen 111, 0, 524288, -1,  "samples/bass/1.11.wav", 0, 0, 1 ; Middle C
-gifn ftgen 200, 0, 524288, -1,  "samples/bass/2.01.wav", 0, 0, 1 ; Middle C
-gifn ftgen 201, 0, 524288, -1,  "samples/bass/2.02.wav", 0, 0, 1 ; Middle C
-gifn ftgen 202, 0, 524288, -1,  "samples/bass/2.03.wav", 0, 0, 1 ; Middle C
-gifn ftgen 203, 0, 524288, -1,  "samples/bass/2.04.wav", 0, 0, 1 ; Middle C
-gifn ftgen 204, 0, 524288, -1,  "samples/bass/2.05.wav", 0, 0, 1 ; Middle C
-gifn ftgen 206, 0, 524288, -1,  "samples/bass/2.06.wav", 0, 0, 1 ; Middle C
-gifn ftgen 207, 0, 524288, -1,  "samples/bass/2.07.wav", 0, 0, 1 ; Middle C
-gifn ftgen 208, 0, 524288, -1,  "samples/bass/2.08.wav", 0, 0, 1 ; Middle C
-gifn ftgen 209, 0, 524288, -1,  "samples/bass/2.09.wav", 0, 0, 1 ; Middle C
-gifn ftgen 210, 0, 524288, -1,  "samples/bass/2.10.wav", 0, 0, 1 ; Middle C
-gifn ftgen 211, 0, 524288, -1,  "samples/bass/2.11.wav", 0, 0, 1 ; Middle C
-gifn ftgen 300, 0, 524288, -1,  "samples/bass/3.00.wav", 0, 0, 1 ; Middle C
-gifn ftgen 301, 0, 524288, -1,  "samples/bass/3.01.wav", 0, 0, 1 ; Middle C
-gifn ftgen 302, 0, 524288, -1,  "samples/bass/3.02.wav", 0, 0, 1 ; Middle C
-gifn ftgen 303, 0, 524288, -1,  "samples/bass/3.03.wav", 0, 0, 1 ; Middle C
-gifn ftgen 304, 0, 524288, -1,  "samples/bass/3.04.wav", 0, 0, 1 ; Middle C
-gifn ftgen 305, 0, 524288, -1,  "samples/bass/3.05.wav", 0, 0, 1 ; Middle C
-gifn ftgen 306, 0, 524288, -1,  "samples/bass/3.06.wav", 0, 0, 1 ; Middle C
-gifn ftgen 307, 0, 524288, -1,  "samples/bass/3.07.wav", 0, 0, 1 ; Middle C
-gifn ftgen 308, 0, 524288, -1,  "samples/bass/3.08.wav", 0, 0, 1 ; Middle C
-gifn ftgen 309, 0, 524288, -1,  "samples/bass/3.09.wav", 0, 0, 1 ; Middle C
-gifn ftgen 310, 0, 524288, -1,  "samples/bass/3.10.wav", 0, 0, 1 ; Middle C
-gifn ftgen 311, 0, 524288, -1,  "samples/bass/3.11.wav", 0, 0, 1 ; Middle C
-
 instr 3
     inum = p5*100
-    asig loscil 1, 1, inum, 1 
+    if inum=105 then
+        asig diskin2 "samples/bass/1.05.wav", 1
+    elseif inum=106 then
+        asig diskin2 "samples/bass/1.06.wav", 1
+    elseif inum=107 then
+        asig diskin2 "samples/bass/1.07.wav", 1
+    elseif inum=108 then
+        asig diskin2 "samples/bass/1.08.wav", 1
+    elseif inum=108 then
+        asig diskin2 "samples/bass/1.09.wav", 1
+    elseif inum=110 then
+        asig diskin2 "samples/bass/1.10.wav", 1
+    elseif inum=111 then
+        asig diskin2 "samples/bass/1.11.wav", 1
+    elseif inum=200 then
+        asig diskin2 "samples/bass/2.00.wav", 1
+    elseif inum=201 then
+        asig diskin2 "samples/bass/2.01.wav", 1
+    elseif inum=202 then
+        asig diskin2 "samples/bass/2.02.wav", 1
+    elseif inum=203 then
+        asig diskin2 "samples/bass/2.03.wav", 1
+    elseif inum=204 then
+        asig diskin2 "samples/bass/2.04.wav", 1
+    elseif inum=205 then
+        asig diskin2 "samples/bass/2.05.wav", 1
+    elseif inum=206 then
+        asig diskin2 "samples/bass/2.06.wav", 1
+    elseif inum=207 then
+        asig diskin2 "samples/bass/2.07.wav", 1
+    elseif inum=208 then
+        asig diskin2 "samples/bass/2.08.wav", 1
+    elseif inum=209 then
+        asig diskin2 "samples/bass/2.09.wav", 1
+    elseif inum=210 then
+        asig diskin2 "samples/bass/2.10.wav", 1
+    elseif inum=211 then
+        asig diskin2 "samples/bass/2.11.wav", 1
+    elseif inum=300 then
+        asig diskin2 "samples/bass/3.00.wav", 1
+    elseif inum=301 then
+        asig diskin2 "samples/bass/3.01.wav", 1
+    elseif inum=302 then
+        asig diskin2 "samples/bass/3.02.wav", 1
+    elseif inum=303 then
+        asig diskin2 "samples/bass/3.03.wav", 1
+    elseif inum=304 then
+        asig diskin2 "samples/bass/3.04.wav", 1
+    elseif inum=305 then
+        asig diskin2 "samples/bass/3.05.wav", 1
+    elseif inum=306 then
+        asig diskin2 "samples/bass/3.06.wav", 1
+    elseif inum=307 then
+        asig diskin2 "samples/bass/3.07.wav", 1
+    elseif inum=308 then
+        asig diskin2 "samples/bass/3.08.wav", 1
+    elseif inum=309 then
+        asig diskin2 "samples/bass/3.09.wav", 1
+    elseif inum=310 then
+        asig diskin2 "samples/bass/3.10.wav", 1
+    elseif inum=311 then
+        asig diskin2 "samples/bass/3.11.wav", 1
+    endif
     outs asig
 endin
 
