@@ -1,0 +1,37 @@
+* Features [4/10]
+- [X] Top-down composition
+- [ ] Coordinate the melody and rhythm
+- [X] Set maximum song length of movement per instrument
+- [ ] Set minimum song length of movement per instrument
+- [ ] Need to support all chord types
+- [X] Doesn't handle rest notes
+- [ ] Handle full ABC BNF (yeah, right, that's gonna happen...)
+- [X] Set instrument octave in score file
+- [ ] Output score to separate file
+- [ ] Support parallel voices - ensure e.g. a certain chord progression is always
+  accompanied by a certain melody
+- [ ] Syncopation
+- [ ] Sustain option for notes (give score notation a sustain symbol, and use it to set how long after the notes's duration to keep holding. With sustain, the next note's start time isn't done by when the current note ends. 
+
+* Bugs [5/6]
+- [X] TLD resets clock for each movement
+- [X] TLD doesn't accept an ordering for the movements
+- [X] Doesn't handle minor chords    
+- [X] Calculated duration is absolute, not relative to BPM
+- [X] Chords don't respect octaves
+- [ ] Whole notes not held for proper duration
+
+* Structure [1/7]    
+- [ ] Chords should be composed of Notes, not ordinary arrays
+- [ ] There should be a Musical_Phrase object that holds phrases (and sets of
+  phrases), and allows them to nest
+- [ ] Does each instrument need a score parameter if the grammars are non-terminating?
+- [ ] Duration should be in beats, not seconds. This ensures movements don't
+  end in the middle of a phrase.
+- [ ] Generate score with proper generation tools, not this string-replace nonsense
+- [X] Store csound score lines with instruments
+- [ ] Upgrade from simple string substitution for the score to something
+  list-based (maybe). Idea is to keep musical phrases intact in the event of a
+  truncation of the score. Also, if done right, no need for retroactive length
+  parsing- a measure is has a specific length, which is known at
+  generation-time, thus solving the length limit problem.
