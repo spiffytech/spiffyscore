@@ -105,26 +105,27 @@ def main():
         },
         "sync_test": {
             "body": {
-#                "lead_instr": {  # Instrument 'melody'
-#                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
-#                    "octave": 8,
-#                    "duration": 30,
-#                    "grammars": {  # Notes for this instrument to use in this piece
-#                        "u": ["A/4, B/4, C/4 D/4 (u)", "D/4' D/4' D/4' D/4' (v)"],
-#                        "v": ["C/4 C/4 C/4 C/4 (w)"],
-#                        "w": ["E/4 F/4 E/4 F/4 (u)"],
-#                    },
-#                },
+                "lead_instr": {  # Instrument 'melody'
+                    "score_line": "i5 %(time)f %(duration)f 7000 %(octave)d.%(note)s",
+                    "octave": 4,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+#                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
+                        "u": ["A/2, B/2, C/2 D/2 (u)", "D/2' D/2' D/2' D/2' (v)"],
+                        "v": ["C/2 C/2 C/2 C/2 (w)"],
+                        "w": ["E/2 F/2 E/2 F/2 (u)"],
+                    },
+                },
                 "follow_instr": {  # Instrument 'melody'
                     "score_line": "i3 %(time)f %(duration)f 7000 %(octave)d.%(note)s",
 #                    "sync": "lead_instr",
                     "octave": 2,
                     "duration": 30,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
-#                        "u": ["E F G E (v)"],
-#                        "v": ["G A A A (e)", "G A A A (v)"],
-#                        "e": ["B A G A (v)"],
+#                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
+                        "u": ["E F G E (v)"],
+                        "v": ["G A A A (e)", "G A A A (v)"],
+                        "e": ["B A G A (v)"],
                     },
                 },
             },

@@ -3,7 +3,7 @@ ksmps=20
 nchnls=1
 
 instr 3
-    if p5=105 then
+    if p5=1.05 then
         asig diskin2 "samples/bass/1.05.wav", 1
     elseif p5=1.06 then
         asig diskin2 "samples/bass/1.06.wav", 1
@@ -82,4 +82,67 @@ endin
 
 instr 4
     aFMinst foscili p4, cpspch(p5), p6, p7, p8, p9
+endin
+
+instr 5
+    if p5=3.07 then
+        asig diskin2 "samples/violin/3.07.wav", 1
+    elseif p5=3.08 then
+        asig diskin2 "samples/violin/3.08.wav", 1
+    elseif p5=3.08 then
+        asig diskin2 "samples/violin/3.09.wav", 1
+    elseif p5=3.10 then
+        asig diskin2 "samples/violin/3.10.wav", 1
+    elseif p5=3.11 then
+        asig diskin2 "samples/violin/3.11.wav", 1
+    elseif p5=4.00 then
+        asig diskin2 "samples/violin/4.00.wav", 1
+    elseif p5=4.01 then
+        asig diskin2 "samples/violin/4.01.wav", 1
+    elseif p5=4.02 then
+        asig diskin2 "samples/violin/4.02.wav", 1
+    elseif p5=4.03 then
+        asig diskin2 "samples/violin/4.03.wav", 1
+    elseif p5=4.04 then
+        asig diskin2 "samples/violin/4.04.wav", 1
+    elseif p5=4.05 then
+        asig diskin2 "samples/violin/4.05.wav", 1
+    elseif p5=4.06 then
+        asig diskin2 "samples/violin/4.06.wav", 1
+    elseif p5=4.07 then
+        asig diskin2 "samples/violin/4.07.wav", 1
+    elseif p5=4.08 then
+        asig diskin2 "samples/violin/4.08.wav", 1
+    elseif p5=4.09 then
+        asig diskin2 "samples/violin/4.09.wav", 1
+    elseif p5=4.10 then
+        asig diskin2 "samples/violin/4.10.wav", 1
+    elseif p5=4.11 then
+        asig diskin2 "samples/violin/4.11.wav", 1
+    elseif p5=5.00 then
+        asig diskin2 "samples/violin/5.00.wav", 1
+    elseif p5=5.01 then
+        asig diskin2 "samples/violin/5.01.wav", 1
+    elseif p5=5.02 then
+        asig diskin2 "samples/violin/5.02.wav", 1
+    elseif p5=5.03 then
+        asig diskin2 "samples/violin/5.03.wav", 1
+    elseif p5=5.04 then
+        asig diskin2 "samples/violin/5.04.wav", 1
+    elseif p5=5.05 then
+        asig diskin2 "samples/violin/5.05.wav", 1
+    elseif p5=5.06 then
+        asig diskin2 "samples/violin/5.06.wav", 1
+    elseif p5=5.07 then
+        asig diskin2 "samples/violin/5.07.wav", 1
+    elseif p5=5.08 then
+        asig diskin2 "samples/violin/5.08.wav", 1
+    elseif p5=5.09 then
+        asig diskin2 "samples/violin/5.09.wav", 1
+    elseif p5=5.10 then
+        asig diskin2 "samples/violin/5.10.wav", 1
+    elseif p5=5.11 then
+        asig diskin2 "samples/violin/5.11.wav", 1
+    endif
+    outs asig
 endin
