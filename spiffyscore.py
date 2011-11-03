@@ -121,9 +121,10 @@ def main():
                     "octave": 2,
                     "duration": 30,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["E F G E (v)"],
-                        "v": ["G A A A (e)", "G A A A (v)"],
-                        "e": ["B A G A (v)"],
+                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
+#                        "u": ["E F G E (v)"],
+#                        "v": ["G A A A (e)", "G A A A (v)"],
+#                        "e": ["B A G A (v)"],
                     },
                 },
             },
@@ -257,16 +258,16 @@ def score_len(score):
 def generate_csound_score(score, score_line, t):
     csound_note_values = {
         "C": "00",
-        "C#": "01",
+        "C#": "01", "Db": "01",
         "D": "02",
-        "D#": "03",
+        "D#": "03", "Eb": "03",
         "E": "04",
         "F": "05",
-        "F#": "06",
+        "F#": "06", "Gb": "06",
         "G": "07",
-        "G#": "08",
+        "G#": "08", "Ab": "08",
         "A": "09",
-        "A#": "10",
+        "A#": "10", "Bb": "10",
         "B": "11",
     }
     csound_score = []
@@ -274,6 +275,7 @@ def generate_csound_score(score, score_line, t):
         if isinstance(token, parse.Chord):  # Chords
             for note in token.chord: 
                 note = csound_note_values[note]
+                csound_score.append(score_line % {"time": t, "octave": token.octave, "note": note, "duration": token.duration})
                 csound_score.append(score_line % {"time": t, "octave": token.octave, "note": note, "duration": token.duration})
         elif isinstance(token, parse.Note):  # Individual notes
             note = csound_note_values[token.value]

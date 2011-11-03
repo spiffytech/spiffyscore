@@ -8,7 +8,6 @@ class Note():
         self.value = value
         self.duration = duration
         self.octave = octave
-        self.accidental = None
     def __repr__(self):
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
@@ -46,7 +45,7 @@ def parse(score, default_octave=8):
 
     t_BASENOTE = r"[A-Ga-g]"
 #    t_BASENOTE = r"I+V?|VI*|i+v?|vi*"
-    t_ACCIDENTAL = r"\^{1,2}|_{1,2}|="
+    t_ACCIDENTAL = r"\^{1}|_{1}|="
     t_REST = r"z"
     t_OCTAVE = r"'+|,+"
     t_CHORD_TYPE = r"m|7|m7|0|o|\+|mb5|sus|sus4|maj7|mmaj7|7sus4|dim|dim7|7b5|m7b5|6|b6|m6|mb6|46|maj9|9|add9|7b9|m9"
@@ -124,7 +123,10 @@ def parse(score, default_octave=8):
     def p_accidental(p):
         '''note : ACCIDENTAL note
         '''
-        p[2].accidental = p[1]
+        if p[1] == "^":
+            p[2].value += "#"
+        else:
+            p[2].value += "b"
         p[0] = p[2]
 
     def p_octave(p):
@@ -155,6 +157,8 @@ def parse(score, default_octave=8):
 
 
     def p_error(p):
+#        import ipdb
+#        ipdb.set_trace()
         print p
         raise Exception("Syntax error at '%s' of element type %s" % (p.value, p.type))
         
