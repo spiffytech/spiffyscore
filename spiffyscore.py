@@ -105,18 +105,20 @@ def main():
         },
         "sync_test": {
             "body": {
-                "lead_instr": {  # Instrument 'melody'
-                    "score_line": "i5 %(time)f %(duration)f 7000 %(octave)d.%(note)s",
-                    "octave": 4,
-                    "duration": 30,
-                    "grammars": {  # Notes for this instrument to use in this piece
-#                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
-                        "u": ["A/2, B/2, C/2 D/2 (u)", "D/2' D/2' D/2' D/2' (v)"],
-                        "v": ["C/2 C/2 C/2 C/2 (w)"],
-                        "w": ["E/2 F/2 E/2 F/2 (u)"],
-                    },
-                },
+#                "lead_instr": {  # Instrument 'melody'
+#                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+##                    "score_line": "i5 %(time)f %(duration)f 7000 %(octave)d.%(note)s",
+#                    "octave": 7,
+#                    "duration": 30,
+#                    "grammars": {  # Notes for this instrument to use in this piece
+##                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
+#                        "u": ["A/2, B/2, C/2 D/2 (u)", "D/2' D/2' D/2' D/2' (v)"],
+#                        "v": ["C/2 C/2 C/2 C/2 (w)"],
+#                        "w": ["E/2 F/2 E/2 F/2 (u)"],
+#                    },
+#                },
                 "follow_instr": {  # Instrument 'melody'
+#                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
                     "score_line": "i3 %(time)f %(duration)f 7000 %(octave)d.%(note)s",
 #                    "sync": "lead_instr",
                     "octave": 2,
@@ -125,16 +127,28 @@ def main():
 #                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
                         "u": ["E F G E (v)"],
                         "v": ["G A A A (e)", "G A A A (v)"],
-                        "e": ["B A G A (v)"],
+                        "e": ["B A G A (u)"],
                     },
                 },
+#                "instr2": {  # Instrument 'melody'
+#                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
+#                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s",
+#                    "octave": 5,
+#                    "duration": 30,
+#                    "grammars": {  # Notes for this instrument to use in this piece
+##                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
+#                        "u": ["A/2, B/2, C/2 D/2 (u)", "D/2' D/2' D/2' D/2' (v)"],
+#                        "v": ["C/2 C/2 C/2 C/2 (w)"],
+#                        "w": ["E/2 F/2 E/2 F/2 (u)"],
+#                    },
+#                },
             },
         },
     }
     print '''f1 0 512 10 1
 f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
 f3 0 1025 10 1
-t 0 100
+t 0 60
     '''
 
     section_start = 0
