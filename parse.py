@@ -124,10 +124,9 @@ def parse(score, default_octave=8):
         '''note : ACCIDENTAL note
         '''
         if p[1] == "^":
-            p[2].value += "#"
+            p[0] = p[2].value + 1
         else:
-            p[2].value += "b"
-        p[0] = p[2]
+            p[0] = p[2].value - 1
 
     def p_octave(p):
         '''note : note OCTAVE
@@ -140,7 +139,17 @@ def parse(score, default_octave=8):
     def p_note(p):
         '''note : BASENOTE
         '''
-        p[0] = Note(p[1], octave=default_octave)
+        notes = {
+            "C": 0,
+            "D": 2,
+            "E": 4,
+            "F": 5,
+            "G": 7,
+            "A": 9,
+            "B": 11
+        }
+        n = notes[p[1]]
+        p[0] = Note(n, octave=default_octave)
 
     def p_rest(p):
         ''' rest : REST
