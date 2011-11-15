@@ -7,6 +7,7 @@ import random
 import sys
 import time
 
+from midiutil.MidiFile import MIDIFile as midifile
 import parse
 import topsort
 import yaml
@@ -14,6 +15,7 @@ import yaml
 import tree
 
 random.seed(time.time())
+mymidi = midifile(15)
 
 def main():
     composition = {
@@ -105,22 +107,21 @@ def main():
         },
         "sync_test": {
             "body": {
-#                "lead_instr": {  # Instrument 'melody'
-#                    "score_line": "i1 %(time)f %(duration)f 7000 %(octave)d.%(note)s %(octave)d.%(note)s 0 6",
-##                    "score_line": "i5 %(time)f %(duration)f 7000 %(octave)d.%(note)s",
-#                    "octave": 7,
-#                    "duration": 30,
-#                    "grammars": {  # Notes for this instrument to use in this piece
-##                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
-#                        "u": ["A/2, B/2, C/2 D/2 (u)", "D/2' D/2' D/2' D/2' (v)"],
-#                        "v": ["C/2 C/2 C/2 C/2 (w)"],
-#                        "w": ["E/2 F/2 E/2 F/2 (u)"],
-#                    },
-#                },
+                "lead_instr": {  # Instrument 'melody'
+                    "channel": 6,
+                    "octave": 4,
+                    "duration": 30,
+                    "grammars": {  # Notes for this instrument to use in this piece
+#                        "u": ["A ^A B C ^C D ^D E F ^F G ^G"],
+                        "u": ["A/2, B/2, C/2 D/2 (u)", "D/2' D/2' D/2' D/2' (x)"],
+                        "v": ["C/2 C/2 C/2 C/2 (w)"],
+                        "w": ["E/2 F/2 E/2 F/2 (u)"],
+                        "x": ["z4 (v)"],
+                    },
+                },
                 "follow_instr": {  # Instrument 'melody'
-#                    "score_line": "i2 %(time)f %(duration)f 7000 %(octave)d.%(note)s 1",
-                    "score_line": "i3 %(time)f %(duration)f 7000 %(octave)d.%(note)s",
-#                    "sync": "lead_instr",
+                    "channel": 0,
+                    "sync": "lead_instr",
                     "octave": 2,
                     "duration": 30,
                     "grammars": {  # Notes for this instrument to use in this piece
@@ -128,6 +129,7 @@ def main():
                         "u": ["E F G E (v)"],
                         "v": ["G A A A (e)", "G A A A (v)"],
                         "e": ["B A G A (u)"],
+                        "x": ["z4 (e)"],
                     },
                 },
 #                "instr2": {  # Instrument 'melody'
@@ -173,19 +175,23 @@ t 0 60
 
                 instrs = []
                 syncs = {}
+                track = 0
                 for instr in ordered_instrs:
                     print ";Instrument " + instr
                     instr = subsection[instr]
                     max_time = instr["duration"]
                     instr_score, syncs = render_instr(instr, syncs, max_time)
                     instrs.append(instr_score)
-                    for line in generate_csound_score(instr_score, instr["score_line"], subsection_start):
-                        print line
+                    generate_csound_score(instr_score, track, instr["channel"], subsection_start)
                 longest_score = max(instrs, key=lambda i: score_len(i))
                 subsection_start += score_len(longest_score)
                 section_start += score_len(longest_score)
+                track += 1
             except KeyError:
                 pass
+    with open("out.mid", "wb") as outfile:
+        mymidi.writeFile(outfile)
+
 
 
 def render_instr(instr, syncs, max_time):
@@ -270,35 +276,27 @@ def score_len(score):
     return total
 
 
-def generate_csound_score(score, score_line, t):
-    csound_note_values = {
-        "C": "00",
-        "C#": "01", "Db": "01",
-        "D": "02",
-        "D#": "03", "Eb": "03",
-        "E": "04",
-        "F": "05",
-        "F#": "06", "Gb": "06",
-        "G": "07",
-        "G#": "08", "Ab": "08",
-        "A": "09",
-        "A#": "10", "Bb": "10",
-        "B": "11",
-    }
-    csound_score = []
+def get_midi_note(octave, note):
+    return note + 12 * (octave+1)
+
+
+def generate_csound_score(score, track, channel, t):
+    # Assume get_midi_note()
+    global mymidi
+
     for token in score:
         if isinstance(token, parse.Chord):  # Chords
             for note in token.chord: 
-                note = csound_note_values[note]
-                csound_score.append(score_line % {"time": t, "octave": token.octave, "note": note, "duration": token.duration})
-                csound_score.append(score_line % {"time": t, "octave": token.octave, "note": note, "duration": token.duration})
+                note = get_midi_note(token.octave, note)
+                mymidi.addNote(track=track, channel=channel,pitch=note, time=t, duration=token.duration, volume=100)
         elif isinstance(token, parse.Note):  # Individual notes
-            note = csound_note_values[token.value]
-            csound_score.append(score_line % {"time": t, "octave": token.octave, "note": note, "duration": token.duration})
+            note = get_midi_note(token.octave, token.value)
+            mymidi.addNote(track=track, channel=channel,pitch=note, time=t, duration=token.duration, volume=100)
         elif isinstance(token, tree.Tree):
             continue
         t += token.duration
-    return csound_score
+
+    return []
 
 
 if __name__ == "__main__": main() 
