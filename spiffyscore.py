@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import ipdb
+#import ipdb
 import os
 import random
 import sys
@@ -22,13 +22,12 @@ def main():
         "intro": {
             "body": {
                 "lead_instr": {  # Instrument 'melody'
-                    "channel": 6,
-                    "octave": 4,
-                    "duration": 30,
+                    "channel": 8,
+                    "octave": 5,
+                    "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["A/2, B/2, C/2 D/2 (u)", "D2' D2' D2' D2' (x)"],
-                        "v": ["C/2 C/2 C/2 C/2 (w)"],
-                        "w": ["E/2 F/2 E/2 F/2 (u)"],
+                        "u": ["C2' B2 A3 D3 B C' D C2' z (u)", "C2' C2' C2' C2' (x)"],
+                        "v": ["G2 F2 E2 F2 D5 (u)", "B/4 C/4' B/4 A/4 D2 z"],
                         "x": ["z4 (v)"],
                     },
                 },
@@ -36,31 +35,45 @@ def main():
                     "channel": 4,
                     "sync": "lead_instr",
                     "octave": 2,
-                    "duration": 30,
+                    "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["E F G E (v)"],
-                        "v": ["G A A A (e)", "G A A A (v)"],
-                        "e": ["B A G A (u)"],
-                        "x": ["z4 (e)"],
+                        "u": ["C/2 C/2 C/2 z/2 (u)"],
+                    },
+                },
+            },
+        },
+        "section1": {
+            "body": {
+                "lead_instr": {  # Instrument 'melody'
+                    "channel": 6,
+                    "octave": 5,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C E A F G z (u)", "C E A F G z (v)"],
+                        "v": ["A/2 D/2 G/2 C/2 | F/2 B/2 E/2 z/2 | (u)"],
+                    },
+                },
+                "follow_instr": {  # Instrument 'bass'
+                    "channel": 4,
+                    "sync": "lead_instr",
+                    "octave": 2,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/2 C/2 C/2 z/2 (u)"],
                     },
                 },
             },
         },
     }
-    print '''f1 0 512 10 1
-f2 0 8192 10 .24 .64 .88 .76 .06 .5 .34 .08
-f3 0 1025 10 1
-t 0 60
-    '''
 
     section_start = 0
-    for section in ["intro"]:
-        print "; Section " + section
+    for section in ["intro", "section1"]:
+        print "Section " + section
         subsection_start = section_start
         section = composition[section]
         for subsection in ["intro", "body", "outro"]:
             try:
-                print "; Subsection " + subsection
+                print "Subsection " + subsection
                 subsection = section[subsection]
 
                 unordered_instrs = []
@@ -76,7 +89,7 @@ t 0 60
                 syncs = {}
                 track = 0
                 for instr in ordered_instrs:
-                    print ";Instrument " + instr
+                    print "Instrument " + instr
                     instr = subsection[instr]
                     max_time = instr["duration"]
                     instr_score, syncs = render_instr(instr, syncs, max_time)
@@ -140,6 +153,8 @@ def choose_phrase(instr, syncs, current_time, time_remaining, score):
         grammar = random.choice(time_filtered_grammars.keys())
     elif instr["sync"] is None:
         grammar = get_next_node(score);
+        if grammar not in instr["grammars"].keys():
+            raise Exception("You tried to direct a grammar to a node that doesn't exist")
     phrases = time_filtered_grammars[grammar]
     if instr["name"] not in syncs.keys():
         syncs[instr["name"]] = []
