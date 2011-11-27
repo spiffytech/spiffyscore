@@ -22,7 +22,7 @@ def main():
         "intro": {
             "body": {
                 "percusion": {
-                    "channel": 14,
+                    "channel": 14,  # Orchestra kit
                     "octave": 4,
                     "duration": 60,
                     "grammars": {
@@ -33,10 +33,12 @@ def main():
                     "channel": 8,
                     "octave": 5,
                     "duration": 60,
+                    "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C2' B2 | A3 D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
-                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
-                        "x": ["z4 | (v)"],
+                        "u": ["[C2'] C2' | [A3] A3 (u)"],
+#                        "u": ["[C2'] [B2] | [A3] D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
+#                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
+#                        "x": ["z4 | (v)"],
                     },
                 },
                 "bass": {
@@ -49,7 +51,7 @@ def main():
                     },
                 },
                 "horn_timbre1": { 
-                    "channel": 13,
+                    "channel": 13,  # 'Atmosphere'
                     "octave": 2,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
@@ -144,7 +146,6 @@ def main():
                 volume = 100
                 if instr.has_key("vol_offset"):
                     volume += instr["vol_offset"]
-                    print "\t\t\tvolume offset = %d, nev volume = %d" % (instr["vol_offset"], volume)
                 midify_instr_score(instr_score, track, instr["channel"], subsection_start, volume=volume)
             longest_score = max(instrs, key=lambda i: score_len(i))
             subsection_start += score_len(longest_score)
@@ -252,9 +253,9 @@ def midify_instr_score(score, track, channel, t, volume):
     global mymidi
 
     for token in score:
-        if isinstance(token, parse.Chord):  # Chords
-            for note in token.chord: 
-                note = get_midi_note(token.octave, note)
+        if isinstance(token, parse.Chord):
+            for note in token.notes: 
+                note = get_midi_note(note.octave, note.value)
                 mymidi.addNote(track=track, channel=channel,pitch=note, time=t, duration=token.duration, volume=volume)
         elif isinstance(token, parse.Note):  # Individual notes
             note = get_midi_note(token.octave, token.value)

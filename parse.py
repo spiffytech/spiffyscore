@@ -5,20 +5,21 @@ import tree
 from ply import lex, yacc
 class Note():
     def __init__(self, value, duration=1, octave=8):
-        self.value = value
         self.duration = duration
+        if value > 12:
+            self.duration += 1
+            value = value % 12
+        self.value = value
         self.octave = octave
     def __repr__(self):
         return "Note %s %s %s" % (self.value, self.duration, self.octave)
 
 class Chord():
-    def __init__(self, value, duration=1, chord_type="major", octave=5):
-        self.value = value
+    def __init__(self, notes, duration=1):
+        self.notes = notes
         self.duration = duration
-        self.chord_type = chord_type
-        self.octave = octave
     def __repr__(self):
-        return "Chord %s %s %s" % (self.value, self.duration, self.chord_type, self.octave)
+        return "Chord %s" % (self.notes)
 
 class Rest():
     def __init__(self, duration=1):
@@ -36,7 +37,7 @@ def parse(score, default_octave=8):
         "REST",
         "OCTAVE",
         "CHORD_TYPE",
-        "PAREN",
+        "BRACKET",
         "SYNCOPATE",
         "NODE",
     )
@@ -49,7 +50,7 @@ def parse(score, default_octave=8):
     t_REST = r"z"
     t_OCTAVE = r"'+|,+"
     t_CHORD_TYPE = r"m|7|m7|0|o|\+|mb5|sus|sus4|maj7|mmaj7|7sus4|dim|dim7|7b5|m7b5|6|b6|m6|mb6|46|maj9|9|add9|7b9|m9"
-    t_PAREN = "\[|\]"
+    t_BRACKET = r"\[|\]"
     t_SYNCOPATE = "\+|-"
     t_NODE = r"\([a-zA-Z0-9_-]+\)"
 
@@ -104,14 +105,16 @@ def parse(score, default_octave=8):
 
 
     def p_chord(p):
-        '''chord : PAREN note PAREN
-                 | PAREN note CHORD_TYPE PAREN
+        '''chord : BRACKET note BRACKET
+                 | BRACKET note CHORD_TYPE BRACKET
         '''
-        pitch = p[2].value
-        pitch = pitch.upper()
-        p[0] = Chord(value=pitch, octave=default_octave)
-        if len(p) > 3:
-            p[0].chord_type = p[3]
+        root_note = p[2].value
+        chorded_notes = []
+
+        for offset in [0, 4, 7]:
+            chorded_notes.append(Note(root_note+offset, octave=p[2].octave))
+
+        p[0] = Chord(notes=chorded_notes)
 
 
     def p_note_syncopate(p):
