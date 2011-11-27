@@ -21,7 +21,15 @@ def main():
     composition = {
         "intro": {
             "body": {
-                "pan_flute": {  # Instrument 'melody'
+                "percusion": {
+                    "channel": 14,
+                    "octave": 4,
+                    "duration": 60,
+                    "grammars": {
+                        "u": ["A ^A (u)"]
+                    }
+                },
+                "pan_flute": {
                     "channel": 8,
                     "octave": 5,
                     "duration": 60,

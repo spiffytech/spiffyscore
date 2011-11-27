@@ -124,9 +124,10 @@ def parse(score, default_octave=8):
         '''note : ACCIDENTAL note
         '''
         if p[1] == "^":
-            p[0] = p[2].value + 1
+            p[2].value += 1
         else:
-            p[0] = p[2].value - 1
+            p[2].value -= 1
+        p[0] = p[2]
 
     def p_octave(p):
         '''note : note OCTAVE
