@@ -49,7 +49,7 @@ def parse(score, default_octave=8):
     t_REST = r"z"
     t_OCTAVE = r"'+|,+"
     t_CHORD_TYPE = r"m|7|m7|0|o|\+|mb5|sus|sus4|maj7|mmaj7|7sus4|dim|dim7|7b5|m7b5|6|b6|m6|mb6|46|maj9|9|add9|7b9|m9"
-    t_PAREN = "\(|\)"
+    t_PAREN = "\[|\]"
     t_SYNCOPATE = "\+|-"
     t_NODE = r"\([a-zA-Z0-9_-]+\)"
 

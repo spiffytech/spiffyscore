@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import division
-#import ipdb
+import ipdb
 import os
 import random
 import sys
@@ -21,45 +21,77 @@ def main():
     composition = {
         "intro": {
             "body": {
-                "lead_instr": {  # Instrument 'melody'
+                "pan_flute": {  # Instrument 'melody'
                     "channel": 8,
                     "octave": 5,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C2' B2 A3 D3 B C' D C2' z (u)", "C2' C2' C2' C2' (x)"],
-                        "v": ["G2 F2 E2 F2 D5 (u)", "B/4 C/4' B/4 A/4 D2 z"],
-                        "x": ["z4 (v)"],
+                        "u": ["C2' B2 | A3 D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
+                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
+                        "x": ["z4 | (v)"],
                     },
                 },
-                "follow_instr": {  # Instrument 'bass'
+                "bass": {
                     "channel": 4,
-                    "sync": "lead_instr",
+                    "sync": "pan_flute",
                     "octave": 2,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C/2 C/2 C/2 z/2 (u)"],
+                    },
+                },
+                "horn_timbre1": { 
+                    "channel": 13,
+                    "octave": 2,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C4 D4 (u)"],
+                    },
+                },
+                "horn_timbre2": {  
+                    "channel": 13,
+                    "octave": 2,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["G4 A4 (u)"],
                     },
                 },
             },
         },
         "section1": {
             "body": {
-                "lead_instr": {  # Instrument 'melody'
+                "guitar": {  # Instrument 'melody'
                     "channel": 6,
                     "octave": 5,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C E A F G z (u)", "C E A F G z (v)"],
-                        "v": ["A/2 D/2 G/2 C/2 | F/2 B/2 E/2 z/2 | (u)"],
+                        "u": ["C | E | A | F | G | z | (u)", "C | E | A | F | G | z | (v)"],
+                        "v": ["A/2 D/2 | G/2 C/2 | F/2 B/2 | E/2 | z/2 | (u)"],
                     },
                 },
-                "follow_instr": {  # Instrument 'bass'
+                "bass": {  # Instrument 'bass'
                     "channel": 4,
-                    "sync": "lead_instr",
+                    "sync": "guitar",
                     "octave": 2,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C/2 C/2 C/2 z/2 (u)"],
+                        "u": ["C/2 C/2 | C/2 z/2 | (u)"],
+                    },
+                },
+                "horn_timbre1": {
+                    "channel": 13,
+                    "octave": 2,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C4 D4 (u)"],
+                    },
+                },
+                "horn_timbre2": { 
+                    "channel": 13,
+                    "octave": 2,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["G4 A4 (u)"],
                     },
                 },
             },
@@ -67,40 +99,49 @@ def main():
     }
 
     section_start = 0
-    for section in ["intro", "section1"]:
-        print "Section " + section
+    for section_name in ["intro", "section1"]:
+        print "Section " + section_name
         subsection_start = section_start
-        section = composition[section]
+        section = composition[section_name]
         for subsection in ["intro", "body", "outro"]:
-            try:
-                print "Subsection " + subsection
-                subsection = section[subsection]
+            if not section.has_key(subsection):
+                continue
+            print "\tSubsection " + subsection
+            subsection = section[subsection]
 
-                unordered_instrs = []
-                for instr in subsection:
-                    subsection[instr]["name"] = instr
-                    if not "sync" in subsection[instr].keys():
-                        subsection[instr]["sync"] = None
-                    unordered_instrs.append([subsection[instr]["sync"], instr])
-                ordered_instrs = topsort.topsort(unordered_instrs)
-                ordered_instrs.remove(None)  # None used as a placeholder for sort order for instruments with no sync setting
+            unordered_instrs = []
+            for instr in subsection:
+                subsection[instr]["name"] = instr
+                if not "sync" in subsection[instr].keys():
+                    subsection[instr]["sync"] = None
+                unordered_instrs.append([subsection[instr]["sync"], instr])
+            ordered_instrs = topsort.topsort(unordered_instrs)
+            ordered_instrs.remove(None)  # None used as a placeholder for sort order for instruments with no sync setting
+            for sync_instr in ordered_instrs:
+                if sync_instr not in subsection.keys():
+                    raise KeyError("The sync instrument '%s' does not exist in this subsection" % sync_instr)
 
-                instrs = []
-                syncs = {}
-                track = 0
-                for instr in ordered_instrs:
-                    print "Instrument " + instr
-                    instr = subsection[instr]
-                    max_time = instr["duration"]
-                    instr_score, syncs = render_instr(instr, syncs, max_time)
-                    instrs.append(instr_score)
-                    midify_instr_score(instr_score, track, instr["channel"], subsection_start)
-                longest_score = max(instrs, key=lambda i: score_len(i))
-                subsection_start += score_len(longest_score)
-                section_start += score_len(longest_score)
-                track += 1
-            except KeyError:
-                pass
+            instrs = []
+            syncs = {}
+            track = 0
+            for instr in ordered_instrs:
+                print "\t\tInstrument " + instr
+#                if instr == "guitar":
+#                    ipdb.set_trace()
+                instr = subsection[instr]
+                max_time = instr["duration"]
+                instr_score, syncs = render_instr(instr, syncs, max_time)
+                instrs.append(instr_score)
+
+                volume = 100
+                if instr.has_key("vol_offset"):
+                    volume += instr["vol_offset"]
+                    print "\t\t\tvolume offset = %d, nev volume = %d" % (instr["vol_offset"], volume)
+                midify_instr_score(instr_score, track, instr["channel"], subsection_start, volume=volume)
+            longest_score = max(instrs, key=lambda i: score_len(i))
+            subsection_start += score_len(longest_score)
+            section_start += score_len(longest_score)
+            track += 1
     with open("out.mid", "wb") as outfile:
         mymidi.writeFile(outfile)
 
@@ -155,6 +196,10 @@ def choose_phrase(instr, syncs, current_time, time_remaining, score):
         grammar = get_next_node(score);
         if grammar not in instr["grammars"].keys():
             raise Exception("You tried to direct a grammar to a node that doesn't exist")
+
+    if grammar not in time_filtered_grammars.keys():
+        return [], syncs
+
     phrases = time_filtered_grammars[grammar]
     if instr["name"] not in syncs.keys():
         syncs[instr["name"]] = []
@@ -194,7 +239,7 @@ def get_midi_note(octave, note):
     return note + 12 * (octave+1)
 
 
-def midify_instr_score(score, track, channel, t):
+def midify_instr_score(score, track, channel, t, volume):
     # Assume get_midi_note()
     global mymidi
 
@@ -202,10 +247,10 @@ def midify_instr_score(score, track, channel, t):
         if isinstance(token, parse.Chord):  # Chords
             for note in token.chord: 
                 note = get_midi_note(token.octave, note)
-                mymidi.addNote(track=track, channel=channel,pitch=note, time=t, duration=token.duration, volume=100)
+                mymidi.addNote(track=track, channel=channel,pitch=note, time=t, duration=token.duration, volume=volume)
         elif isinstance(token, parse.Note):  # Individual notes
             note = get_midi_note(token.octave, token.value)
-            mymidi.addNote(track=track, channel=channel,pitch=note, time=t, duration=token.duration, volume=100)
+            mymidi.addNote(track=track, channel=channel,pitch=note, time=t, duration=token.duration, volume=volume)
         elif isinstance(token, tree.Tree):
             continue
         t += token.duration
