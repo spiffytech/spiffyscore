@@ -108,13 +108,18 @@ def parse(score, default_octave=8):
         '''chord : BRACKET note BRACKET
                  | BRACKET note CHORD_TYPE BRACKET
         '''
-        root_note = p[2].value
-        chorded_notes = []
 
-        for offset in [0, 4, 7]:
-            chorded_notes.append(Note(root_note+offset, octave=p[2].octave))
+        if len(p) > 3:
+            chorded_notes = []
+            root_note = p[2].value
+            for offset in [0, 4, 7]:
+                chorded_notes.append(Note(root_note+offset, octave=p[2].octave))
+            chord = Chord(notes=chorded_notes)
+        else:  # This won'k work until the grammar is modified to rocognise multiple notes botween brackets
+            chord = p[1:-2]
+                
 
-        p[0] = Chord(notes=chorded_notes)
+        p[0] = chord
 
 
     def p_note_syncopate(p):

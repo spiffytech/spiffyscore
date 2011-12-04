@@ -3,6 +3,7 @@
 from __future__ import division
 import ipdb
 import os
+from pprint import pprint
 import random
 import sys
 import time
@@ -15,31 +16,53 @@ import yaml
 import tree
 
 random.seed(time.time())
-mymidi = midifile(15)
+mymidi = midifile(15, deinterleave=True)
 
 def main():
     composition = {
         "intro": {
-            "body": {
-                "percusion": {
-                    "channel": 14,  # Orchestra kit
-                    "octave": 4,
-                    "duration": 60,
-                    "grammars": {
-                        "u": ["A ^A (u)"]
-                    }
-                },
+            "intro": {
                 "pan_flute": {
                     "channel": 8,
                     "octave": 5,
                     "duration": 60,
                     "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["[C2'] C2' | [A3] A3 (u)"],
-#                        "u": ["[C2'] [B2] | [A3] D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
-#                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
-#                        "x": ["z4 | (v)"],
+                        "u": ["C2' B2 | A3 D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
+                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
+                        "x": ["z8 | (v)"],
                     },
+                },
+                "taisho_koto": {
+                    "channel": 11,
+                    "octave": 5,
+                    "duration": 60,
+                    "sync": "pan_flute",
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/2 F/2 | D/2 z/2 | z4 | (u)", "C/2 F/2 | G/2 F/2 | (u)", "A/2 F/2 z/2 C/2 | z | (u)"],
+                        "v": ["z4 (v)"],
+                        "x": ["C/2 C/2 | F/2 G/2 | F/2, G/2 | z/2 C/2 | (x)", "C/2 F/2 | D/2 C/4 z/4 | F/2 G/2 A/2 C/2 | (x)"],
+                    },
+                },
+                "vibraphone": {
+                    "channel": 14,
+                    "vol_offset": 27,
+                    "octave": 5,
+                    "sync": "pan_flute",
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["z4 (u)"],
+                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
+                        "x": ["z4 | (v)"],
+                    },
+                },
+                "percusion": {
+                    "channel": 9,  # Orchestra kit
+                    "octave": 4,
+                    "duration": 60,
+                    "grammars": {
+                        "u": ["A ^A (u)"]
+                    }
                 },
                 "bass": {
                     "channel": 4,
@@ -47,32 +70,100 @@ def main():
                     "octave": 2,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C/2 C/2 C/2 z/2 (u)"],
+                        "u": ["C/2 C/2 C (u)"],
                     },
                 },
                 "horn_timbre1": { 
                     "channel": 13,  # 'Atmosphere'
                     "octave": 2,
                     "duration": 60,
+                    "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C4 D4 (u)"],
+                        "u": ["[C]4 [D]4 (u)"],
                     },
                 },
-                "horn_timbre2": {  
-                    "channel": 13,
+            },
+            "body": {
+                "percusion": {
+                    "channel": 9,  # Orchestra kit
+                    "octave": 4,
+                    "duration": 60,
+                    "grammars": {
+                        "u": ["A ^A (u)"]
+                    }
+                },
+                "vibraphone": {
+                    "channel": 14,
+                    "vol_offset": 27,
+                    "octave": 5,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C2' B2 | A3 D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
+                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
+                        "x": ["z4 | (v)"],
+                    },
+                },
+                "bass": {
+                    "channel": 4,
+                    "sync": "vibraphone",
                     "octave": 2,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["G4 A4 (u)"],
+                        "u": ["C/2 C/2 C (u)"],
+                    },
+                },
+                "horn_timbre1": { 
+                    "channel": 13,  # 'Atmosphere'
+                    "octave": 2,
+                    "duration": 60,
+                    "vol_offset": -15,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["[C]4 [D]4 (u)"],
                     },
                 },
             },
         },
         "section1": {
+            "intro": {
+                "reverse_cymbal": {
+                    "channel": 5,
+                    "octave": 3,
+                    "duration": 3,
+                    "grammars": {
+                        "u": ["B3"]
+                    }
+                },
+                "bass": {
+                    "channel": 4,
+                    "octave": 2,
+                    "duration": 3,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/2 C/2 C (u)"],
+                    },
+                },
+                "percusion": {
+                    "channel": 9,  # Orchestra kit
+                    "octave": 4,
+                    "duration": 3,
+                    "vol_offset": -10,
+                    "grammars": {
+                        "u": ["E,, | z4 | (u)"]
+                    }
+                },
+                "atmosphere1": {
+                    "channel": 13,
+                    "octave": 2,
+                    "duration": 3,
+                    "vol_offset": -15,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["[C]4 (u)"],
+                    },
+                },
+            },
             "body": {
                 "guitar": {  # Instrument 'melody'
-                    "channel": 6,
-                    "octave": 5,
+                    "channel": 11,
+                    "octave": 4,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C | E | A | F | G | z | (u)", "C | E | A | F | G | z | (v)"],
@@ -88,20 +179,52 @@ def main():
                         "u": ["C/2 C/2 | C/2 z/2 | (u)"],
                     },
                 },
-                "horn_timbre1": {
+                "percusion": {
+                    "channel": 9,  # Orchestra kit
+                    "octave": 4,
+                    "duration": 60,
+                    "vol_offset": -10,
+                    "grammars": {
+                        "u": ["^G,, | ^A,, | ^G,,/2 ^A,,/2 | E,, | z4 | (u)", "E,, | z4 | (u)"]
+                    }
+                },
+                "atmosphere1": {
                     "channel": 13,
                     "octave": 2,
                     "duration": 60,
+                    "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C4 D4 (u)"],
+                        "u": ["[C]4 [D]4 (u)"],
                     },
                 },
-                "horn_timbre2": { 
+            },
+        },
+        "blackmore1": {
+            "intro": {
+                "guitar": {
+                    "channel": 6,
+                    "octave": 3,
+                    "duration": 60,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C3 | C/4 D/4 E | C/4 C | (u)"],
+                    },
+                },
+                "contrabass": {
                     "channel": 13,
                     "octave": 2,
                     "duration": 60,
+                    "vol_offset": -45,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["G4 A4 (u)"],
+                        "u": ["[C]4 [D]4 (u)"],
+                    },
+                },
+                "choir": {
+                    "channel": 7,
+                    "octave": 3,
+                    "duration": 60,
+                    "vol_offset": -35,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C2 G2 F2 B,2 C3 (u)"],
                     },
                 },
             },
@@ -109,7 +232,7 @@ def main():
     }
 
     section_start = 0
-    for section_name in ["intro", "section1"]:
+    for section_name in ["intro", "section1", "blackmore1"]:
         print "Section " + section_name
         subsection_start = section_start
         section = composition[section_name]
@@ -146,11 +269,12 @@ def main():
                 volume = 100
                 if instr.has_key("vol_offset"):
                     volume += instr["vol_offset"]
+                mymidi.addTrackName(track, 0, instr["name"])
                 midify_instr_score(instr_score, track, instr["channel"], subsection_start, volume=volume)
+                track += 1
             longest_score = max(instrs, key=lambda i: score_len(i))
             subsection_start += score_len(longest_score)
             section_start += score_len(longest_score)
-            track += 1
     with open("out.mid", "wb") as outfile:
         mymidi.writeFile(outfile)
 
@@ -159,7 +283,11 @@ def main():
 def render_instr(instr, syncs, max_time):
     for g in instr["grammars"]:
         for i in range(len(instr["grammars"][g])):
-            instr["grammars"][g][i] = parse.parse(instr["grammars"][g][i], default_octave=instr["octave"])
+            try:
+                instr["grammars"][g][i] = parse.parse(instr["grammars"][g][i], default_octave=instr["octave"])
+            except topsort.CycleError:
+                print "Your syncs created a loop! Fix it."
+                sys.exit(1)
 
     score= []
     try:
@@ -192,6 +320,9 @@ def choose_phrase(instr, syncs, current_time, time_remaining, score):
         raise ValueError("No available grammars that will fit in the score")
 
     grammar = None
+#    if instr["name"] == "taisho_koto":
+#        ipdb.set_trace()
+
     if instr["sync"] is not None:
         guiding_instr = instr["sync"]
         sync_node = get_sync_node_at_time(syncs[guiding_instr], current_time)
