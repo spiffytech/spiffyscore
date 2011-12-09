@@ -39,9 +39,9 @@ def main():
                     "duration": 60,
                     "sync": "pan_flute",
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C/2 F/2 | D/2 z/2 | z4 | (u)", "C/2 F/2 | G/2 F/2 | (u)", "A/2 F/2 z/2 C/2 | z | (u)"],
-                        "v": ["z4 (v)"],
-                        "x": ["C/2 C/2 | F/2 G/2 | F/2, G/2 | z/2 C/2 | (x)", "C/2 F/2 | D/2 C/4 z/4 | F/2 G/2 A/2 C/2 | (x)"],
+                        "u": ["C/2 F/2 | D/2 z/2 | z4 | (u)", "C/2 F/2 | G/2 F/2 | (u)", "A/2 F/2 z/2 C/2 | z | (v)"],
+                        "v": ["z4 (x)"],
+                        "x": ["C/2 C/2 | F/2 G/2 | F/2, G/2 | z/2 C/2 | (x)", "C/2 F/2 | D/2 C/4 z/4 | F/2 G/2 A/2 C/2 | (v)"],
                     },
                 },
                 "vibraphone": {
@@ -204,7 +204,7 @@ def main():
                 "guitar": {
                     "channel": 6,
                     "octave": 3,
-                    "duration": 60,
+                    "duration": 15,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C3 | C/4 D/4 E | C/4 C | (u)"],
                     },
@@ -212,7 +212,7 @@ def main():
                 "contrabass": {
                     "channel": 13,
                     "octave": 2,
-                    "duration": 60,
+                    "duration": 15,
                     "vol_offset": -45,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["[C]4 [D]4 (u)"],
@@ -221,7 +221,7 @@ def main():
                 "choir": {
                     "channel": 7,
                     "octave": 3,
-                    "duration": 60,
+                    "duration": 15,
                     "vol_offset": -35,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C2 G2 F2 B,2 C3 (u)"],
@@ -233,13 +233,13 @@ def main():
 
     section_start = 0
     for section_name in ["intro", "section1", "blackmore1"]:
-        print "Section " + section_name
+        print "Section", section_name, "at second", section_start
         subsection_start = section_start
         section = composition[section_name]
         for subsection in ["intro", "body", "outro"]:
             if not section.has_key(subsection):
                 continue
-            print "\tSubsection " + subsection
+            print "\tSubsection", subsection, "at", subsection_start
             subsection = section[subsection]
 
             unordered_instrs = []
