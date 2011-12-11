@@ -16,16 +16,28 @@ import yaml
 import tree
 
 random.seed(time.time())
-mymidi = midifile(15, deinterleave=True)
+mymidi = midifile(15)
 
 def main():
     composition = {
         "intro": {
             "intro": {
+                "marimba": {
+                    "channel": 15,
+                    "octave": 3,
+                    "duration": 20,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/2 D/2 | F/2 D/2 | F/2 D/2 | C | (v)", "C/2 D/2 | F/2 D/2 | F/2 F/2 | C | (x)"],
+                        "v": ["F/4 F/4 F/4 F/4 | F/4 F/4 D/2 | C/2 F/2 | C | (u)"],
+                        "x": ["C2 | C2 | z2 | C | F | (v)"],
+                    },
+                },
+            },
+            "body": {
                 "pan_flute": {
                     "channel": 8,
                     "octave": 5,
-                    "duration": 60,
+                    "duration": 80,
                     "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C2' B2 | A3 D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
@@ -36,7 +48,7 @@ def main():
                 "taisho_koto": {
                     "channel": 11,
                     "octave": 5,
-                    "duration": 60,
+                    "duration": 80,
                     "sync": "pan_flute",
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C/2 F/2 | D/2 z/2 | z4 | (u)", "C/2 F/2 | G/2 F/2 | (u)", "A/2 F/2 z/2 C/2 | z | (v)"],
@@ -49,7 +61,7 @@ def main():
                     "vol_offset": 27,
                     "octave": 5,
                     "sync": "pan_flute",
-                    "duration": 60,
+                    "duration": 80,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["z4 (u)"],
                         "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
@@ -59,7 +71,7 @@ def main():
                 "percusion": {
                     "channel": 9,  # Orchestra kit
                     "octave": 4,
-                    "duration": 60,
+                    "duration": 80,
                     "grammars": {
                         "u": ["A ^A (u)"]
                     }
@@ -68,26 +80,19 @@ def main():
                     "channel": 4,
                     "sync": "pan_flute",
                     "octave": 2,
-                    "duration": 60,
+                    "duration": 80,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C/2 C/2 C (u)"],
                     },
                 },
-                "horn_timbre1": { 
-                    "channel": 13,  # 'Atmosphere'
-                    "octave": 2,
-                    "duration": 60,
-                    "vol_offset": -15,
-                    "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["[C]4 [D]4 (u)"],
-                    },
-                },
             },
+        },
+        "section1": {
             "body": {
                 "percusion": {
                     "channel": 9,  # Orchestra kit
                     "octave": 4,
-                    "duration": 60,
+                    "duration": 80,
                     "grammars": {
                         "u": ["A ^A (u)"]
                     }
@@ -96,7 +101,7 @@ def main():
                     "channel": 14,
                     "vol_offset": 27,
                     "octave": 5,
-                    "duration": 60,
+                    "duration": 80,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C2' B2 | A3 D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
                         "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
@@ -107,7 +112,7 @@ def main():
                     "channel": 4,
                     "sync": "vibraphone",
                     "octave": 2,
-                    "duration": 60,
+                    "duration": 80,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["C/2 C/2 C (u)"],
                     },
@@ -115,7 +120,7 @@ def main():
                 "horn_timbre1": { 
                     "channel": 13,  # 'Atmosphere'
                     "octave": 2,
-                    "duration": 60,
+                    "duration": 80,
                     "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["[C]4 [D]4 (u)"],
@@ -123,7 +128,7 @@ def main():
                 },
             },
         },
-        "section1": {
+        "section2": {
             "intro": {
                 "reverse_cymbal": {
                     "channel": 5,
@@ -147,7 +152,7 @@ def main():
                     "duration": 3,
                     "vol_offset": -10,
                     "grammars": {
-                        "u": ["E,, | z4 | (u)"]
+                        "u": ["E,, | z2 | (u)"]
                     }
                 },
                 "atmosphere1": {
@@ -156,7 +161,7 @@ def main():
                     "duration": 3,
                     "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["[C]4 (u)"],
+                        "u": ["[C]3 (u)"],
                     },
                 },
             },
@@ -166,8 +171,9 @@ def main():
                     "octave": 4,
                     "duration": 60,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C | E | A | F | G | z | (u)", "C | E | A | F | G | z | (v)"],
+                        "u": ["C | F | D | C | D | z2 | (x)", "C | E | A | F | G | z | (v)"],
                         "v": ["A/2 D/2 | G/2 C/2 | F/2 B/2 | E/2 | z/2 | (u)"],
+                        "x": ["A | C/2 C/2 | F/2 D/2 | (u)"],
                     },
                 },
                 "bass": {  # Instrument 'bass'
@@ -199,40 +205,156 @@ def main():
                 },
             },
         },
-        "blackmore1": {
-            "intro": {
-                "guitar": {
-                    "channel": 6,
+#        "JollyRogerLagoon": {
+#            "body": {
+##                "piccolo": {
+##                    "channel": 8,
+##                    "octave": 6,
+##                    "duration": 60,
+##                    "grammars": {  # Notes for this instrument to use in this piece
+##                        "u": ["F/8 z/8 F/8 z/8 C/8 z/8 C/8 | z2 | (u)"],
+##                    },
+##                },
+#                "harp": {
+#                    "channel": 14,
+#                    "octave": 5,
+#                    "duration": 60,
+#                    "grammars": {  # Notes for this instrument to use in this piece
+#                        "u": ["C/2 D/2 | E/2 F/2 | C/2 z/2 | z | (v)", " | (v)"],
+#                    },
+#                },
+#                "violin": {
+#                    "channel": 3,
+#                    "octave": 4,
+#                    "duration": 60,
+#                    "vol_offset": -55,
+#                    "grammars": {  # Notes for this instrument to use in this piece
+#                        "u": ["C2 G2 F2 B,2 C3 (u)"],
+#                    },
+#                },
+#            },
+#        },
+        "JollyRogerLagoon": {
+            "body": {
+                "harp": {
+                    "channel": 14,
                     "octave": 3,
-                    "duration": 15,
+                    "duration": 70,
+                    "sync": "marimba",
+                    "vol_offset": 27,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C3 | C/4 D/4 E | C/4 C | (u)"],
+                        "u": ["z (u)"],
+                        "v": ["z (v)"],
+                        "x": ["z (x)"],
+                        "w": ["C | F/2 F/2 | D/2 D/2 C/2 C/2 | F | (w)"],
                     },
                 },
-                "contrabass": {
-                    "channel": 13,
+                "percussion2": {
+                    "channel": 12,
+                    "octave": 4,
+                    "duration": 70,
+#                    "vol_offset": -20,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C | C | C/2 D/2 | C | z | (u)"],
+                    },
+                },
+                "horn_timbre": {
+                    "channel": 13,  # 'Atmosphere'
                     "octave": 2,
-                    "duration": 15,
-                    "vol_offset": -45,
+                    "duration": 70,
+                    "vol_offset": -15,
                     "grammars": {  # Notes for this instrument to use in this piece
                         "u": ["[C]4 [D]4 (u)"],
                     },
                 },
-                "choir": {
-                    "channel": 7,
+                "percusion": {
+                    "channel": 9,  # Orchestra kit
+                    "octave": 4,
+                    "duration": 70,
+                    "grammars": {
+                        "u": ["A ^A (u)"]
+                    }
+                },
+                "marimba": {
+                    "channel": 15,
                     "octave": 3,
-                    "duration": 15,
-                    "vol_offset": -35,
+                    "duration": 70,
+                    "vol_offset": 10,
                     "grammars": {  # Notes for this instrument to use in this piece
-                        "u": ["C2 G2 F2 B,2 C3 (u)"],
+                        "u": ["C/2 D/2 | F/2 D/2 | F/2 D/2 | C | z | (v)", "C/2 D/2 | F/2 D/2 | F/2 F/2 | C | z | (x)"],
+                        "v": ["F/4 F/4 F/4 F/4 | F/4 F/4 D/2 | C/2 F/2 | C | z | (u)"],
+                        "x": ["C2 | C2 | z2 | C | F | (w)"],
+                        "w": [" z8 | (u)"],
                     },
                 },
             },
         },
+        "end": {
+            "body": {
+                "horn_timbre": {
+                    "channel": 13,  # 'Atmosphere'
+                    "octave": 2,
+                    "duration": 40,
+                    "vol_offset": -15,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["[C]4 [D]4 (u)"],
+                    },
+                },
+                "percusion": {
+                    "channel": 9,  # Orchestra kit
+                    "octave": 4,
+                    "duration": 40,
+                    "grammars": {
+                        "u": ["A ^A (u)"]
+                    }
+                },
+                "pan_flute": {
+                    "channel": 8,
+                    "octave": 5,
+                    "duration": 40,
+                    "vol_offset": -15,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C2' B2 | A3 D3 || B | C' | D | C2' C2' | z | (u)", "C2' C2' | C2' C2' | (x)"],
+                        "v": ["G2 F2 | E2 F2 | D5 (u)", "B/4 C/4' B/4 A/4 | D2 D2 | z | (u)"],
+                        "x": ["z8 | (v)"],
+                    },
+                },
+                "taisho_koto": {
+                    "channel": 11,
+                    "octave": 5,
+                    "duration": 40,
+                    "sync": "pan_flute",
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["C/2 F/2 | D/2 z/2 | z4 | (u)", "C/2 F/2 | G/2 F/2 | (u)", "A/2 F/2 z/2 C/2 | z | (v)"],
+                        "v": ["z4 (x)"],
+                        "x": ["C/2 C/2 | F/2 G/2 | F/2, G/2 | z/2 C/2 | (x)", "C/2 F/2 | D/2 C/4 z/4 | F/2 G/2 A/2 C/2 | (v)"],
+                    },
+                },
+            },
+            "outro": {
+                "horn_timbre": {
+                    "channel": 13,  # 'Atmosphere'
+                    "octave": 2,
+                    "duration": 20,
+                    "vol_offset": -15,
+                    "grammars": {  # Notes for this instrument to use in this piece
+                        "u": ["[C]4 [D]4 (u)"],
+                    },
+                },
+                "percusion": {
+                    "channel": 9,  # Orchestra kit
+                    "octave": 4,
+                    "duration": 20,
+                    "grammars": {
+                        "u": ["A ^A (u)"]
+                    }
+                },
+            },
+        }
     }
 
     section_start = 0
-    for section_name in ["intro", "section1", "blackmore1"]:
+    for section_name in ["intro", "section1", "section2", "JollyRogerLagoon", "end"]:
         print "Section", section_name, "at second", section_start
         subsection_start = section_start
         section = composition[section_name]
